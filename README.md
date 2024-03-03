@@ -26,6 +26,8 @@ My toolkit ranging from code to deep neural networks allows me to unveil insight
 #
 #
 
+[![Andreas WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=andreasfahl)](https://github.com/anuraghazra/github-readme-stats)
+
 ### 📊 Stats
 
 ![Andreas GitHub stats](https://github-readme-stats.vercel.app/api?username=afadesigns&show_icons=true&theme=gruvbox)
