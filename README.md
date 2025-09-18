@@ -48,23 +48,7 @@
 
   <hr>
 
-  <p align="center">
-    <a href="https://github.com/afadesigns/afadesigns">
-      <img src="https://github-readme-stats.vercel.app/api/pin/?username=afadesigns&repo=afadesigns&theme=tokyonight&hide_border=true" alt="afadesigns Repo" />
-    </a>
-    <a href="https://github.com/afadesigns/socialsense">
-      <img src="https://github-readme-stats.vercel.app/api/pin/?username=afadesigns&repo=socialsense&theme=tokyonight&hide_border=true" alt="socialsense Repo" />
-    </a>
-  </p>
-
-  <hr>
-
-  <p align="center">
-    <img src="https://github-readme-activity-graph.vercel.app/graph?username=afadesigns&theme=tokyo-night&hide_border=true&radius=8" alt="Contribution Graph" />
-  </p>
-
-  <hr>
-
+  <!-- Socials inline -->
   <p align="center" style="margin: 0 0 20px;">
     <a href="https://afadesign.co">
       <img src="https://img.shields.io/badge/Portfolio-111827?style=for-the-badge&logo=About.me&logoColor=white" alt="Portfolio" />
