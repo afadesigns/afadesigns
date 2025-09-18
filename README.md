@@ -1,43 +1,95 @@
-# 🏄‍♂️ Andreas Fahl
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
 
-**`Don't blindly follow the crowd.`**
+  <!-- 🌊 Motto -->
+  <p align="center">
+    <img src="https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&weight=600&size=28&duration=3000&pause=800&color=0EA5E9&center=true&vCenter=true&width=720&lines=Don't+blindly+follow+the+crowd" alt="Motto Animation" />
+  </p>
 
-My toolkit ranging from code to deep neural networks allows me to unveil insights that drive strategic decisions and innovative solutions.
+  <hr>
 
+  <p align="center">
+    <b>Bringing ideas to life through visually captivating designs and interactive experiences.</b>
+  </p>
 
-### 🧰 Languages and Tools
-#
-<!-- icons.html -->
-<img align="left" alt="HTML" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-plain.svg" />
-<img align="left" alt="CSS" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-plain.svg" />
-<img align="left" alt="JavaScript" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-plain.svg" />
-<img align="left" alt="C#" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-plain.svg" />
-<img align="left" alt="Node.js" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" />
-<img align="left" alt="Python" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-plain.svg" />
-<img align="left" alt="ASP.NET" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" />
-<img align="left" alt="Django" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/django/django-plain.svg" />
-<img align="left" alt="Wordpress" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/wordpress/wordpress-original.svg" />
-<img align="left" alt="Selenium" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/selenium/selenium-original.svg" />
-<img align="left" alt="TensorFlow" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" />
-<img align="left" alt="PyTorch" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg" />
-<img align="left" alt="GCP" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" />
-<img align="left" alt="React" width="30px" style="padding-right:10px;" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" />
+  <hr>
 
-#
-#
+  <p align="center">
+    <img src="https://skillicons.dev/icons?i=python,js,ts,cs,dotnet,nodejs,react,rust,wordpress,html,css,fastapi,linux,git,github,postgres,redis,docker,gcp,pytorch&perline=10" alt="Tech Stack" />
+  </p>
 
-[![Andreas WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=andreasfahl)](https://github.com/anuraghazra/github-readme-stats)
+  <hr>
 
-### 📊 Stats
+  <!-- 📊 GitHub Stats Section -->
+  <p align="center">
+    <img height="180" src="https://github-readme-stats.vercel.app/api?username=afadesigns&show_icons=true&theme=tokyonight&hide_border=true" alt="GitHub Stats" />
+  </p>
 
-![Andreas GitHub stats](https://github-readme-stats.vercel.app/api?username=afadesigns&show_icons=true&theme=gruvbox)
+  <p align="center">
+    <img height="170" src="https://streak-stats.demolab.com?user=afadesigns&theme=tokyonight&hide_border=true" alt="GitHub Streak" />
+    <img height="170" src="https://github-readme-stats.vercel.app/api/wakatime?username=andreasfahl&theme=tokyonight&hide_border=true" alt="WakaTime Stats" />
+  </p>
 
-<!-- ![GitHub Streak](https://streak-stats.demolab.com?user=afadesigns&theme=gruvbox&border_radius=4.5) -->
+  <hr>
 
-#
+  <p align="center">
+    <img src="https://github-profile-trophy.vercel.app/?username=afadesigns&theme=matrix&no-frame=true&margin-w=12&margin-h=12" alt="GitHub Trophies" />
+  </p>
 
-<details>
- <summary><h3>👨‍💻 My Coding Journey</h3></summary>
-Resolved to confront this unease, I've decided to embrace discomfort once more, reigniting the aspiration that once drove me. This entails recalibrating my focus, optimizing my path to carve out the necessary bandwidth to realize this long-held dream. As I implement strategic adjustments through the remainder of this year, I am poised to fully embark on this venture in 2024. The journey ahead is daunting, yet the resolve to fulfill the ambitions of my younger self burns brighter than ever. Await my next move with anticipation, for I am on the cusp of diving back into the creative abyss, this time, to emerge with a product distinctly my own.
+  <p align="center">
+    <img src="https://img.shields.io/github/followers/afadesigns?label=Followers&style=for-the-badge&logo=github" alt="Followers" />
+    <img src="https://img.shields.io/github/stars/afadesigns?label=Stars&style=for-the-badge&logo=github" alt="Stars" />
+    <img src="https://komarev.com/ghpvc/?username=afadesigns&style=for-the-badge&color=0ea5e9" alt="Profile Views" />
+  </p>
 
-[website]: https://afadesign.co
+  <hr>
+
+  <p align="center">
+    <a href="https://github.com/afadesigns/afadesigns">
+      <img src="https://github-readme-stats.vercel.app/api/pin/?username=afadesigns&repo=afadesigns&theme=tokyonight&hide_border=true" alt="afadesigns Repo" />
+    </a>
+    <a href="https://github.com/afadesigns/socialsense">
+      <img src="https://github-readme-stats.vercel.app/api/pin/?username=afadesigns&repo=socialsense&theme=tokyonight&hide_border=true" alt="socialsense Repo" />
+    </a>
+  </p>
+
+  <hr>
+
+  <p align="center">
+    <img src="https://github-readme-activity-graph.vercel.app/graph?username=afadesigns&theme=tokyo-night&hide_border=true&radius=8" alt="Contribution Graph" />
+  </p>
+
+  <hr>
+
+  <p align="center" style="margin: 0 0 20px;">
+    <a href="https://afadesign.co">
+      <img src="https://img.shields.io/badge/Portfolio-111827?style=for-the-badge&logo=About.me&logoColor=white" alt="Portfolio" />
+    </a>
+    <a href="https://www.linkedin.com/in/andreasfahl">
+      <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+    </a>
+    <a href="mailto:afadesign.official@gmail.com">
+      <img src="https://img.shields.io/badge/Email-DC2626?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+    </a>
+    <a href="https://www.facebook.com/andreas.fahl.5">
+      <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="Facebook" />
+    </a>
+    <a href="https://www.instagram.com/afadesign.official">
+      <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram" />
+    </a>
+    <a href="https://buymeacoffee.com/andreasfahl">
+      <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-111827?style=for-the-badge&logo=buy-me-a-coffee&logoColor=FFDD00" alt="Buy Me a Coffee" />
+    </a>
+  </p>
+
+  <!-- Footer Wave -->
+  <p align="center" style="margin: 0;">
+    <img src="https://capsule-render.vercel.app/api?type=waving&color=9333EA&height=120&section=footer" alt="Footer Wave" />
+  </p>
+
+</body>
+</html>
