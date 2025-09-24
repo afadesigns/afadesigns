@@ -12,11 +12,11 @@
 
   <text x="20" y="100" class="prompt">afadesigns@github $</text>
   <text x="220" y="100" class="text">cat tech_stack.txt</text>
-  <text x="20" y="130" class="text">Python · TypeScript · JavaScript · React · FastAPI · Docker · Postgres · Redis · Linux</text>
+  <text x="20" y="130" class="text">Python · Bash · JavaScript · React · FastAPI · Docker · Postgres · Redis · Linux</text>
 
   <text x="20" y="170" class="prompt">afadesigns@github $</text>
   <text x="220" y="170" class="text">stats --summary</text>
-  <text x="20" y="200" class="text">followers: 200+   ·   stars: 150+   ·   views: 5k+</text>
+  <text x="20" y="200" class="text">followers: 0+   ·   stars: 3+   ·   views: 5k+</text>
 
   <text x="20" y="240" class="prompt">afadesigns@github $</text>
   <text x="220" y="240" class="text">vlink portfolio   → https://afadesign.co</text>
@@ -33,7 +33,7 @@
 
 <text x="20" y="420" class="prompt">afadesigns@github $</text>
 <text x="220" y="420" class="text">gh profile view afadesigns --show-contributions</text>
-<rect x="700" y="407" width="12" height="15" fill="#3fb950">
+<rect x="700" y="407" width="12" height="14" fill="#3fb950">
   <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
 </rect>
 </svg>
