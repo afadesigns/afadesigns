@@ -24,18 +24,6 @@
 
   <hr>
 
-  <!-- 📊 GitHub Stats Section -->
-  <p align="center">
-    <img height="180" src="https://github-readme-stats.vercel.app/api?username=afadesigns&show_icons=true&theme=tokyonight&hide_border=true" alt="GitHub Stats" />
-  </p>
-
-  <p align="center">
-    <img height="170" src="https://streak-stats.demolab.com?user=afadesigns&theme=tokyonight&hide_border=true" alt="GitHub Streak" />
-    <img height="170" src="https://github-readme-stats.vercel.app/api/wakatime?username=andreasfahl&theme=tokyonight&hide_border=true" alt="WakaTime Stats" />
-  </p>
-
-  <hr>
-
   <p align="center">
     <img src="https://github-profile-trophy.vercel.app/?username=afadesigns&theme=matrix&no-frame=true&margin-w=12&margin-h=12" alt="GitHub Trophies" />
   </p>
