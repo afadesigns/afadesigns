@@ -33,7 +33,7 @@
 
 <text x="20" y="420" class="prompt">afadesigns@github $</text>
 <text x="220" y="420" class="text">gh profile view afadesigns --show-contributions</text>
-<rect x="700" y="407" width="12" height="13" fill="#3fb950">
+<rect x="700" y="407" width="12" height="15" fill="#3fb950">
   <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
 </rect>
 </svg>
