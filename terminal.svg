@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="420" viewBox="0 0 950 420">
+  <style>
+    .prompt { fill:#3fb950; font-family:JetBrains Mono, monospace; font-size:14px; }
+    .text   { fill:#000000; font-family:JetBrains Mono, monospace; font-size:14px; }
+    @media (prefers-color-scheme: dark) { .text { fill:#ffffff; } }
+  </style>
+
+  <!-- Transparent background -->
+  <rect x="0" y="0" width="950" height="420" fill="transparent"/>
+
+  <!-- Help -->
+  <text x="20" y="30" class="prompt">afadesigns@github $</text>
+  <text x="220" y="30" class="text">help</text>
+  <text x="20" y="60" class="text"># commands: cat, stats, vlink</text>
+
+  <!-- Tech stack -->
+  <text x="20" y="100" class="prompt">afadesigns@github $</text>
+  <text x="220" y="100" class="text">cat tech_stack.txt</text>
+  <text x="20" y="130" class="text">Python · TypeScript · JavaScript · React · FastAPI · Docker · Postgres · Redis · Linux</text>
+
+  <!-- Stats placeholder -->
+  <text x="20" y="170" class="prompt">afadesigns@github $</text>
+  <text x="220" y="170" class="text">stats --summary</text>
+  <text x="220" y="200" class="text">→ see live badges below ▼</text>
+
+  <!-- Links -->
+  <text x="20" y="240" class="prompt">afadesigns@github $</text>
+  <text x="220" y="240" class="text">vlink portfolio   → https://afadesign.co</text>
+
+  <text x="20" y="270" class="prompt">afadesigns@github $</text>
+  <text x="220" y="270" class="text">vlink linkedin    → https://ww
