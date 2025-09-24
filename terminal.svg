@@ -16,12 +16,12 @@
   <!-- Tech stack -->
   <text x="20" y="110" class="prompt">afadesigns@github $</text>
   <text x="240" y="110" class="text">cat tech_stack.txt</text>
-  <text x="20" y="140" class="text">Python · TypeScript · JavaScript · React · FastAPI · Docker · Postgres · Redis · Linux</text>
+  <text x="20" y="140" class="text">Python · Bash · JavaScript · React · FastAPI · Docker · Postgres · Redis · Linux</text>
 
   <!-- Stats -->
   <text x="20" y="180" class="prompt">afadesigns@github $</text>
   <text x="240" y="180" class="text">stats --summary</text>
-  <text x="240" y="210" class="text">followers: 200+   ·   stars: 150+   ·   views: 5k+</text>
+  <text x="240" y="210" class="text">followers: 0+   ·   stars: 3+   ·   views: 5k+</text>
 
   <!-- Links -->
   <text x="20" y="250" class="prompt">afadesigns@github $</text>
