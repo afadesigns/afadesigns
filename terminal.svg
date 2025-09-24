@@ -1,53 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="950" height="460" viewBox="0 0 950 460">
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="420" viewBox="0 0 950 420">
   <style>
     .prompt { fill:#3fb950; font-family:JetBrains Mono, monospace; font-size:14px; }
     .text   { fill:#000000; font-family:JetBrains Mono, monospace; font-size:14px; }
     @media (prefers-color-scheme: dark) { .text { fill:#ffffff; } }
   </style>
 
-  <!-- Transparent background -->
-  <rect x="0" y="0" width="950" height="460" fill="transparent" stroke="#3fb950" stroke-width="2" rx="8" ry="8"/>
+  <text x="20" y="30" class="prompt">afadesigns@github $</text>
+  <text x="220" y="30" class="text">help</text>
 
-  <!-- Help -->
-  <text x="20" y="40" class="prompt">afadesigns@github $</text>
-  <text x="240" y="40" class="text">help</text>
-  <text x="20" y="70" class="text"># commands: cat, stats, vlink</text>
+  <text x="20" y="60" class="text"># commands: cat, stats, vlink</text>
 
-  <!-- Tech stack -->
-  <text x="20" y="110" class="prompt">afadesigns@github $</text>
-  <text x="240" y="110" class="text">cat tech_stack.txt</text>
-  <text x="20" y="140" class="text">Python · Git · JavaScript · React · FastAPI · Docker · Postgres · Redis · Linux</text>
+  <text x="20" y="100" class="prompt">afadesigns@github $</text>
+  <text x="220" y="100" class="text">cat tech_stack.txt</text>
+  <text x="20" y="130" class="text">Python · TypeScript · JavaScript · React · FastAPI · Docker · Postgres · Redis · Linux</text>
 
-  <!-- Stats -->
-  <text x="20" y="180" class="prompt">afadesigns@github $</text>
-  <text x="240" y="180" class="text">stats --summary</text>
-  <text x="240" y="210" class="text">followers: 200+   ·   stars: 150+   ·   views: 5k+</text>
+  <text x="20" y="170" class="prompt">afadesigns@github $</text>
+  <text x="220" y="170" class="text">stats --summary</text>
+  <text x="20" y="200" class="text">followers: 200+   ·   stars: 150+   ·   views: 5k+</text>
 
-  <!-- Links -->
-  <text x="20" y="250" class="prompt">afadesigns@github $</text>
-  <text x="240" y="250" class="text">vlink portfolio   → https://afadesign.co</text>
+  <text x="20" y="240" class="prompt">afadesigns@github $</text>
+  <text x="220" y="240" class="text">vlink portfolio   → https://afadesign.co</text>
+  <text x="20" y="270" class="prompt">afadesigns@github $</text>
+  <text x="220" y="270" class="text">vlink linkedin    → https://www.linkedin.com/in/andreasfahl</text>
+  <text x="20" y="300" class="prompt">afadesigns@github $</text>
+  <text x="220" y="300" class="text">vlink email       → afadesign.official@gmail.com</text>
+  <text x="20" y="330" class="prompt">afadesigns@github $</text>
+  <text x="220" y="330" class="text">vlink facebook    → https://www.facebook.com/andreas.fahl.5</text>
+  <text x="20" y="360" class="prompt">afadesigns@github $</text>
+  <text x="220" y="360" class="text">vlink instagram   → https://www.instagram.com/afadesign.official</text>
+  <text x="20" y="390" class="prompt">afadesigns@github $</text>
+  <text x="220" y="390" class="text">vlink coffee      → https://buymeacoffee.com/andreasfahl</text>
 
-  <text x="20" y="280" class="prompt">afadesigns@github $</text>
-  <text x="240" y="280" class="text">vlink linkedin    → https://www.linkedin.com/in/andreasfahl</text>
-
-  <text x="20" y="310" class="prompt">afadesigns@github $</text>
-  <text x="240" y="310" class="text">vlink email       → afadesign.official@gmail.com</text>
-
-  <text x="20" y="340" class="prompt">afadesigns@github $</text>
-  <text x="240" y="340" class="text">vlink facebook    → https://www.facebook.com/andreas.fahl.5</text>
-
-  <text x="20" y="370" class="prompt">afadesigns@github $</text>
-  <text x="240" y="370" class="text">vlink instagram   → https://www.instagram.com/afadesign.official</text>
-
-  <text x="20" y="400" class="prompt">afadesigns@github $</text>
-  <text x="240" y="400" class="text">vlink coffee      → https://buymeacoffee.com/andreasfahl</text>
-
-  <!-- Final command -->
-  <text x="20" y="430" class="prompt">afadesigns@github $</text>
-  <text x="240" y="430" class="text">gh profile view afadesigns --show-contributions</text>
-
-  <!-- Blinking cursor -->
-  <rect x="780" y="418" width="12" height="15" fill="#3fb950">
-    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
-  </rect>
+<text x="20" y="420" class="prompt">afadesigns@github $</text>
+<text x="220" y="420" class="text">gh profile view afadesigns --show-contributions</text>
+<rect x="700" y="407" width="12" height="15" fill="#3fb950">
+  <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+</rect>
 </svg>
