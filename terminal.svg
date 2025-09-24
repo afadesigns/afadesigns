@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="950" height="500" viewBox="0 0 950 500">
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="480" viewBox="0 0 950 480">
   <style>
     .prompt { fill:#3fb950; font-family:JetBrains Mono, monospace; font-size:14px; }
     .text   { fill:#000000; font-family:JetBrains Mono, monospace; font-size:14px; }
     @media (prefers-color-scheme: dark) { .text { fill:#ffffff; } }
   </style>
 
-  <!-- Frame with extra bottom padding -->
-  <rect x="0" y="0" width="950" height="500" fill="transparent" stroke="#3fb950" stroke-width="2" rx="8" ry="8"/>
+  <!-- Transparent background + green frame -->
+  <rect x="0" y="0" width="950" height="480" fill="transparent" stroke="#3fb950" stroke-width="2" rx="8" ry="8"/>
 
   <!-- Help -->
   <text x="20" y="40" class="prompt">afadesigns@github $</text>
