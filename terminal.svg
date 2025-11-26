@@ -21,7 +21,7 @@
   <!-- Stats -->
   <text x="20" y="180" class="prompt">afadesigns@github $</text>
   <text x="240" y="180" class="text">stats --summary</text>
-  <text x="240" y="210" class="text">followers: 0+   ·   stars: 3+   ·   views: 5k+</text>
+  <text x="240" y="210" class="text">followers: 3+   ·   stars: 7+   ·   Repositories: 62+</text>
 
   <!-- Links -->
   <text x="20" y="250" class="prompt">afadesigns@github $</text>
