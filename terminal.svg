@@ -3,6 +3,9 @@
     .prompt { fill:#3fb950; font-family:JetBrains Mono, monospace; font-size:14px; }
     .text   { fill:#000000; font-family:JetBrains Mono, monospace; font-size:14px; }
     @media (prefers-color-scheme: dark) { .text { fill:#ffffff; } }
+    .cursor { animation: blink 1s linear infinite; }
+    @keyframes blink { 0%, 100% { opacity:1; } 50% { opacity:0; } }
+    @media (prefers-reduced-motion: reduce) { .cursor { animation:none; } }
   </style>
 
   <!-- Transparent background + green frame -->
@@ -18,10 +21,10 @@
   <text x="240" y="110" class="text">cat tech_stack.txt</text>
   <text x="20" y="140" class="text">Python · ZSH · JavaScript · Shell · Go · HTML · Postgres · CSS · Rust</text>
 
-  <!-- Stats -->
+  <!-- GitHub stats snapshot: 2026-10-04; repository count includes public and private. -->
   <text x="20" y="180" class="prompt">afadesigns@github $</text>
   <text x="240" y="180" class="text">stats --summary</text>
-  <text x="240" y="210" class="text">followers: 3+   ·   stars: 9+   ·   Repositories: 22+</text>
+  <text x="240" y="210" class="text">followers: 7   ·   stars: 47   ·   Repositories: 24</text>
 
   <!-- Links -->
   <text x="20" y="250" class="prompt">afadesigns@github $</text>
@@ -31,7 +34,7 @@
   <text x="240" y="280" class="text">vlink linkedin    → https://www.linkedin.com/in/andreasfahl</text>
 
   <text x="20" y="310" class="prompt">afadesigns@github $</text>
-  <text x="240" y="310" class="text">vlink email       → afadesign.official@gmail.com</text>
+  <text x="240" y="310" class="text">vlink email       → github@afadesign.co</text>
 
   <text x="20" y="340" class="prompt">afadesigns@github $</text>
   <text x="240" y="340" class="text">vlink facebook    → https://www.facebook.com/andreas.fahl.5</text>
@@ -47,7 +50,5 @@
   <text x="240" y="440" class="text">gh profile view afadesigns --show-contributions</text>
 
   <!-- Blinking cursor -->
-  <rect x="780" y="427" width="12" height="15" fill="#3fb950">
-    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
-  </rect>
+  <rect x="780" y="427" width="12" height="15" fill="#3fb950" class="cursor"/>
 </svg>
