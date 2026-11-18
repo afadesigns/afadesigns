@@ -1,0 +1,55 @@
+export const terminalTemplate = String.raw`<svg xmlns="http://www.w3.org/2000/svg" width="950" height="480" viewBox="0 0 950 480">
+  <style>
+    .prompt { fill:#3fb950; font-family:JetBrains Mono, monospace; font-size:14px; }
+    .text   { fill:#000000; font-family:JetBrains Mono, monospace; font-size:14px; }
+    @media (prefers-color-scheme: dark) { .text { fill:#ffffff; } }
+    .cursor { animation: blink 1s linear infinite; }
+    @keyframes blink { 0%, 100% { opacity:1; } 50% { opacity:0; } }
+    @media (prefers-reduced-motion: reduce) { .cursor { animation:none; } }
+  </style>
+
+  <!-- Transparent background + green frame -->
+  <rect x="0" y="0" width="950" height="480" fill="transparent" stroke="#3fb950" stroke-width="2" rx="8" ry="8"/>
+
+  <!-- Help -->
+  <text x="20" y="40" class="prompt">afadesigns@github $</text>
+  <text x="240" y="40" class="text">help</text>
+  <text x="20" y="70" class="text"># commands: cat, stats, vlink</text>
+
+  <!-- Tech stack -->
+  <text x="20" y="110" class="prompt">afadesigns@github $</text>
+  <text x="240" y="110" class="text">cat tech_stack.txt</text>
+  <text x="20" y="140" class="text">Python · ZSH · JavaScript · Shell · Go · HTML · Postgres · CSS · Rust</text>
+
+  <!-- GitHub stats snapshot: 2026-10-04; repository count includes public and private. -->
+  <text x="20" y="180" class="prompt">afadesigns@github $</text>
+  <text x="240" y="180" class="text">stats --summary</text>
+  <text x="240" y="210" class="text">followers: 7   ·   stars: 47   ·   Repositories: 24</text>
+
+  <!-- Links -->
+  <text x="20" y="250" class="prompt">afadesigns@github $</text>
+  <text x="240" y="250" class="text">vlink portfolio   → https://afadesign.co</text>
+
+  <text x="20" y="280" class="prompt">afadesigns@github $</text>
+  <text x="240" y="280" class="text">vlink linkedin    → https://www.linkedin.com/in/andreasfahl</text>
+
+  <text x="20" y="310" class="prompt">afadesigns@github $</text>
+  <text x="240" y="310" class="text">vlink email       → github@afadesign.co</text>
+
+  <text x="20" y="340" class="prompt">afadesigns@github $</text>
+  <text x="240" y="340" class="text">vlink facebook    → https://www.facebook.com/andreas.fahl.5</text>
+
+  <text x="20" y="370" class="prompt">afadesigns@github $</text>
+  <text x="240" y="370" class="text">vlink instagram   → https://www.instagram.com/afadesign.official</text>
+
+  <text x="20" y="400" class="prompt">afadesigns@github $</text>
+  <text x="240" y="400" class="text">vlink coffee      → https://buymeacoffee.com/andreasfahl</text>
+
+  <!-- Final command -->
+  <text x="20" y="440" class="prompt">afadesigns@github $</text>
+  <text x="240" y="440" class="text">gh profile view afadesigns --show-contributions</text>
+
+  <!-- Blinking cursor -->
+  <rect x="780" y="427" width="12" height="15" fill="#3fb950" class="cursor"/>
+</svg>
+`;

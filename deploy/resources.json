@@ -1,0 +1,11 @@
+{
+  "accountId": "3cd944aab212b5cb1b7066e32f17b426",
+  "stage": {
+    "worker": "github-profile-stage",
+    "namespaceId": "d776df49e58643fa873772ec53fa53ae"
+  },
+  "production": {
+    "worker": "github-profile-prod",
+    "namespaceId": "aeae71f12c784fc7826ea2cf6c1c2474"
+  }
+}

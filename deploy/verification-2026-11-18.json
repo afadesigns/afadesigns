@@ -1,0 +1,20 @@
+{
+  "observedAt": "Wed, 18 Nov 2026 21:37:39 GMT",
+  "url": "https://github-profile-stage.afadesign.workers.dev/terminal.svg",
+  "syntheticFixture": true,
+  "get": 200,
+  "head": 200,
+  "revalidation": 304,
+  "etag": "\"bb83211439157bae239aba3bd380e8bea29a677ddf582c8c62646f26d2ae017a\"",
+  "updatedAt": "2026-11-18T21:36:30.564Z",
+  "imageBytes": 2820,
+  "moduleSha256": "aa01ed950809bbb4d5d5a283c0bcd30d8f7238fe45499d2045029cf5304b96b4",
+  "versionId": "58c9d5c5-43bd-4812-b907-8f8dcd82fac7",
+  "deploymentId": "f9ff8cad-8303-49d8-80b3-bfd643daf6dc",
+  "tests": {
+    "passed": 59,
+    "failed": 0,
+    "skipped": 0
+  },
+  "productionDeployed": false
+}
