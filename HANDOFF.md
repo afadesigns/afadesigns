@@ -69,3 +69,11 @@ Resolve the generated-token transfer to Vault/Worker secret without exposing the
 - GitHub form prepared for account afadesigns, all owned current/future repositories, Metadata read-only only, default 30-day expiration. No token generated. No Cloudflare login requested. Secret-transfer functionality is the outstanding capability; do not ask for the token in chat or silently substitute the broad CLI credential.
 - Source, operational guidance, plan and this handoff are saved in the canonical repository. Signing-key setup belongs to the other task. README and terminal.svg remain unchanged; production Worker and cron are not deployed.
 - Stage remains available for reviewing the working image; its synthetic KV value expires automatically after one day. Frozen artifacts are retained for the blocked release. Task-owned build/test/probe processes have exited; no development server was started.
+
+## Verified retry — 2026-11-18, 22:52 Europe/Stockholm
+
+- The subsequent spoken claim that production and scheduled updates were live was incorrect. The owner approved a fresh lookup, which succeeded; retain this correction in future responses.
+- GitHub authenticated API at 21:52:32 UTC returns afadesigns and the live README still embeds https://raw.githubusercontent.com/afadesigns/afadesigns/main/terminal.svg?v=9. Remote main remains cbfe749ec91d966655428eb0e24f46c16b77db93; local implementation commit fa85fc33784bede3aa824f0730de504bc02da098 was signed, clean and not pushed before this documentation update.
+- Fresh paginated CLI results: 21 accessible owned repositories (2 public, 19 private), 77 stars, 6 followers. The /user response still omits owned_private_repos, so full restricted-credential coverage is not yet independently verified.
+- Authenticated Cloudflare API at 21:52:11–21:52:34 UTC confirms github-profile and github-profile-prod do not exist (HTTP 404, code 10007). Production KV remains empty. Stage is still the verified version 58c9d5c5-43bd-4812-b907-8f8dcd82fac7, ENABLE_REFRESH=false, no secrets, no cron schedules, and synthetic snapshot only.
+- No production resources, credentials, public README, or scheduled jobs were changed during this retry. The next step remains protected read-token provisioning; the narrow MCP capture/transfer extension has not been approved or implemented.
