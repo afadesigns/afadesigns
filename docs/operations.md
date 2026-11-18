@@ -126,6 +126,8 @@ failures before the next refresh; do not replace good data with an estimate.
 - The synthetic end-to-end transfer succeeded. All recipient processes stopped, and the temporary relay Worker/KV were deleted and verified absent. Restart provisioning with fresh ephemeral resources after approval.
 - Cloudflare Browser Integrity Check rejects Python urllib's default client with error 1010 on workers.dev. Unmodified curl and the actual Cloud Browser work. No account protection was changed.
 
+The reviewed implementation is published in signed commit `b3e44c2c62e058b4c42377cd0f5e7f1e6e06ad83`; normal push, signature and exact remote-main equality were verified.
+
 ## Configuration references
 
 - [Programmatic Cloudflare configuration](https://developers.cloudflare.com/cf/projects/cloudflare-config/)
