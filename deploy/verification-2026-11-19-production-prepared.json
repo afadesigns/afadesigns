@@ -1,0 +1,46 @@
+{
+  "recordedAt": "2026-11-18T23:13:37.696051+00:00",
+  "moduleSha256": "f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c",
+  "worker": "github-profile-prod",
+  "versionId": "c9f3445a-c3d6-48c3-8cc5-314a8173eca0",
+  "deploymentId": "e37d317d-68dd-4d9f-99fc-d7bc9790831e",
+  "uploadedAt": "2026-11-18T23:10:40.789137Z",
+  "codeReadbackMatched": true,
+  "enableRefresh": false,
+  "secrets": [],
+  "schedules": [],
+  "workersDev": false,
+  "previewUrls": false,
+  "kvKeys": 0,
+  "productionLive": false,
+  "readmeChanged": false,
+  "applicationTests": {
+    "passed": 82,
+    "failed": 0,
+    "skipped": 0,
+    "durableJobId": "e593b3ff-1a82-4c6c-b403-61b1971fef7b"
+  },
+  "provisioningTests": {
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0
+  },
+  "syntheticEndToEndTransferPassed": true,
+  "livePairInstalled": false,
+  "pendingApproval": {
+    "action": "Create dedicated classic GitHub PAT",
+    "scopes": [
+      "read:user"
+    ],
+    "destination": "github-profile-prod/GITHUB_CENSUS_TOKEN",
+    "expiration": "2026-12-18",
+    "created": false,
+    "reason": "Automatic approval review requires explicit user authorization for this credential type and permission."
+  },
+  "cleanup": {
+    "relayWorkerDeleted": true,
+    "relayKvDeleted": true,
+    "absenceReadback": 404,
+    "recipientsStopped": true
+  }
+}

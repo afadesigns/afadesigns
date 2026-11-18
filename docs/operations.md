@@ -21,7 +21,7 @@ layout, links, animation, and framework text remain unchanged.
 | Mode | Worker | Data | Refresh | GitHub secret |
 | --- | --- | --- | --- | --- |
 | `stage` | `github-profile-stage` | Synthetic aggregates in separate KV | Disabled, no cron | Absent |
-| `production` | `github-profile-prod` | Live aggregates | Hourly | Required |
+| `production` | `github-profile-prod` | Live aggregates | Hourly | Both read-only credentials required |
 
 `deploy/resources.json` must contain top-level `stage` and `production` objects,
 each with a `namespaceId` for its existing KV namespace. The configuration rejects
@@ -31,16 +31,50 @@ disabled. The Vite plugin has remote bindings disabled and serves no static asse
 
 ## Credentials and release
 
-Provision `GITHUB_TOKEN` as a production Worker secret through the established
-secret-management flow. Use read access to metadata for **all repositories owned
-by the account**, including private repositories. The credential must also let
-`/user` return a valid non-negative integer `owned_private_repos`. Missing or
-invalid private-count data fails with `private_coverage_unverified` before any
-snapshot write. Every collection must match both the account's public count and
-its complete public-plus-private total; restricted or partial inventories are
-rejected. Verify the credential's repository selection and compare the first
-result against an independent complete inventory. Do not put credentials in the
-repository, command arguments, logs, or stage bindings.
+Provision two dedicated production Worker secrets through the protected provisioning flow:
+
+| Secret | Credential and grant | API use |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | Fine-grained PAT, all current/future repositories owned by afadesigns, Metadata read-only | Account identity and paginated owned repository metadata |
+| `GITHUB_CENSUS_TOKEN` | Classic PAT with **only `read:user`** | Account identity and independent public/private repository census |
+
+The exact Metadata-only PAT was tested and does not return `owned_private_repos`.
+GitHub documents the private `/user` response under `read:user`; this separate
+read-only credential supplies the census without repository or profile-write
+scopes. The collector requires an exact normalized `read:user` scope header and
+matching positive numeric account IDs for both credentials. Repository requests
+always use the Metadata token. Only the six public aggregate fields are stored.
+
+Missing or invalid private-count data fails with `private_coverage_unverified`
+before any snapshot write. Every collection must match both the public count and
+the complete public-plus-private census; partial inventories remain rejected.
+Verify all-owned repository selection and compare the first result against an
+independent complete inventory. Never put credentials in repository files,
+command arguments, logs, stage bindings or chat.
+
+### One-time provisioning and renewal
+
+Use `scripts/provisioning-recipient.mjs` with its JSONL protocol. First complete a
+`synthetic` transfer to the disposable relay Worker using the fixed test value.
+The browser encrypts locally with RSA-OAEP; the temporary Worker stores only
+ciphertext, under the exact SHA-256 receipt, with a hard expiry and no logs.
+The recipient's private key remains in memory.
+
+For the live pair, prepare `census`, transfer the read:user-only credential, and
+consume its exact receipt. This validates and holds the credential in memory;
+it does not install a secret. Then prepare `live` and transfer the existing
+Metadata credential. The original census deadline remains in force across both
+steps. After identity, full-inventory and independent aggregate checks succeed,
+one fixed native cf bulk-secret request installs both production secrets through
+an anonymous pipe. No credential file is written. Closing input, expiration or
+stopping the recipient clears retained credentials; installation outcomes that
+cannot be confirmed require reconciliation before any new attempt.
+
+Delete the temporary relay Worker and its isolated KV namespace after the
+transfer, stop the recipient and clear the browser clipboard. Keep the original
+static SVG as a rollback. Record token expiry dates and repeat the same scoped
+procedure before expiration; an expired token preserves the last good snapshot
+but prevents fresh hourly counts.
 
 The reviewed compatibility date is `2026-10-13`, matching the installed workerd. Use `redirect: 'manual'` for GitHub requests and explicitly reject non-200 responses; workerd does not support the Fetch `error` redirect mode.
 
@@ -82,17 +116,21 @@ traces are sampled at one percent. Investigate repeated refresh failures or a
 stale timestamp using the scheduled invocation logs. Correct access or upstream
 failures before the next refresh; do not replace good data with an estimate.
 
-## Verified release state — 2026-11-18
+## Verified release state — 2026-11-19
 
-- `github-profile-stage` was uploaded through the authenticated Cloudflare plugin and read back at version `58c9d5c5-43bd-4812-b907-8f8dcd82fac7` (100 percent active).
-- Its live endpoint is `https://github-profile-stage.afadesign.workers.dev/terminal.svg`; current displayed counters are synthetic test data, with a 24-hour KV expiry. No token or cron is attached.
-- Both build modes have module SHA-256 `aa01ed950809bbb4d5d5a283c0bcd30d8f7238fe45499d2045029cf5304b96b4`. Retained frozen candidates are under `.cloudflare/releases/`; keep them until the production decision is resolved.
-- The full compiled runtime gate passed 59 tests, with no failures or skips. Remote missing-data/route/method checks and populated GET/HEAD/ETag revalidation are recorded in `deploy/verification-2026-11-18.json`.
-- Cloudflare Browser Integrity Check rejects Python urllib's default client with error 1010 on workers.dev. Unmodified curl and the real Cloud Browser reach and render the endpoint. Do not disable account-wide protection to work around a test-client signature.
-- Production has not been deployed; README still references the verified static SVG. The exact metadata-only GitHub credential must be provisioned and successfully pass live private-coverage validation before production activation.
+- Both explicit modes have module SHA-256 `f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c`. Frozen candidates are under `.cloudflare/releases/2026-11-18-{stage,production}-f874cbfb8fe8`; build-date labels use UTC.
+- The new application gate passed **82 tests**, including the actual compiled workerd path, with zero failures/skips. Protected provisioning passed **33 tests**, including real anonymous-pipe transport, descendant termination, matching receipts, role binding, EOF/stop cancellation and shared expiry.
+- Stage is live at `https://github-profile-stage.afadesign.workers.dev/terminal.svg`, version `501aacb5-c683-462a-9af4-fb3160d2b118`. It has isolated synthetic counters and no credentials or cron. GET/HEAD, ETag, route/method handling and exact local SVG equality passed; see `deploy/verification-2026-11-19-stage.json`.
+- Production code is uploaded at version `c9f3445a-c3d6-48c3-8cc5-314a8173eca0` with the same verified bytes. Activation is disabled: no secrets or schedule, refresh false, workers.dev and previews off, empty production KV. See `deploy/verification-2026-11-19-production-prepared.json`.
+- Automatic approval review blocked creation of the separate classic `read:user` census token pending explicit owner authorization. The existing all-owned Metadata-read PAT expires on 2026-12-18; the census form is prepared with the same expiration. No classic token was generated. README still points to the original static SVG.
+- The synthetic end-to-end transfer succeeded. All recipient processes stopped, and the temporary relay Worker/KV were deleted and verified absent. Restart provisioning with fresh ephemeral resources after approval.
+- Cloudflare Browser Integrity Check rejects Python urllib's default client with error 1010 on workers.dev. Unmodified curl and the actual Cloud Browser work. No account protection was changed.
 
 ## Configuration references
 
 - [Programmatic Cloudflare configuration](https://developers.cloudflare.com/cf/projects/cloudflare-config/)
 - [Configuration fields and trigger builders](https://developers.cloudflare.com/cf/projects/config-explorer/)
 - [Vite plugin version 2 migration](https://developers.cloudflare.com/cf/wrangler/migrate/)
+
+- [GitHub authenticated user census](https://docs.github.com/en/rest/users/users#get-the-authenticated-user)
+- [GitHub read:user scope and scope headers](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps)

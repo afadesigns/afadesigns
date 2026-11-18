@@ -170,7 +170,7 @@ test('successful refresh writes only allowlisted aggregate data after all upstre
 });
 
 test('stage refresh stays disabled without reading credentials or touching storage', async () => {
-  const env = { ENABLE_REFRESH: 'false', get GITHUB_TOKEN() { throw new Error('must not read'); } };
+  const env = { ENABLE_REFRESH: 'false', get GITHUB_TOKEN() { throw new Error('must not read'); }, get GITHUB_CENSUS_TOKEN() { throw new Error('must not read'); } };
   assert.deepEqual(await worker.scheduled({}, env, {}), { skipped: true });
 });
 
@@ -193,7 +193,7 @@ test('rendered stats replace only the snapshot comment and original stats row', 
 
 test('public image requests do not call GitHub and implement HEAD and ETag correctly', async () => {
   const env = environment();
-  Object.defineProperty(env, 'GITHUB_TOKEN', { get() { throw new Error('public route must not read credential'); } });
+  for (const key of ['GITHUB_TOKEN', 'GITHUB_CENSUS_TOKEN']) Object.defineProperty(env, key, { get() { throw new Error('public route must not read credential'); } });
   const response = await worker.fetch(new Request('https://profile.example/terminal.svg'), env, {});
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('content-type'), 'image/svg+xml; charset=utf-8');
@@ -240,4 +240,103 @@ test('unsupported routes and methods do not access storage', async () => {
   const response = await worker.fetch(new Request('https://profile.example/terminal.svg', { method: 'POST' }), env, {});
   assert.equal(response.status, 405);
   assert.equal(response.headers.get('allow'), 'GET, HEAD');
+});
+
+
+const CENSUS_TOKEN = 'synthetic-census-read-user-only';
+const ACCOUNT_ID = 151975154;
+const pairedIdentity = { id: ACCOUNT_ID, login: USERNAME, followers: 1, public_repos: 99 };
+const censusBody = { id: ACCOUNT_ID, ...user, followers: 7, email: 'private-canary@example.invalid', private_gists: 99 };
+const censusResponse = (body = censusBody, scopes = 'read:user') => json(body, scopes === null ? {} : { 'x-oauth-scopes': scopes });
+
+test('paired collection uses an independent read-only census while all repository pages use the metadata token', async () => {
+  const upstream = mockFetch([
+    json(pairedIdentity),
+    censusResponse(),
+    json([repo(1, 8), repo(2, 3, true)], { link: '<' + nextPage + '>; rel="next"' }),
+    json([repo(3, 5, false, true)]),
+  ]);
+  const result = await collectStats({ token: TOKEN, censusToken: CENSUS_TOKEN, fetchImpl: upstream.fetchImpl, now: () => new Date(NOW) });
+  assert.deepEqual(result, { ...snapshot, followers: 7, stars: 16, repositories: 3 });
+  assert.deepEqual(upstream.calls.map(call => [call.url, new Headers(call.options.headers).get('authorization')]), [
+    ['https://api.github.com/user', 'Bearer ' + TOKEN],
+    ['https://api.github.com/user', 'Bearer ' + CENSUS_TOKEN],
+    [firstPage, 'Bearer ' + TOKEN],
+    [nextPage, 'Bearer ' + TOKEN],
+  ]);
+  assert.equal(JSON.stringify(result).includes(CENSUS_TOKEN), false);
+  assert.equal(JSON.stringify(result).includes('private-canary'), false);
+});
+
+test('readCensus returns only allowlisted census fields from an exact read:user scope', async () => {
+  const { readCensus } = await import('../src/profile.mjs');
+  assert.equal(typeof readCensus, 'function');
+  const upstream = mockFetch([censusResponse(censusBody, ' read:user, read:user ')]);
+  const result = await readCensus({ token: CENSUS_TOKEN, username: USERNAME, fetchImpl: upstream.fetchImpl });
+  assert.deepEqual(result, { id: ACCOUNT_ID, username: USERNAME, followers: 7, publicRepos: 2, ownedPrivateRepos: 1 });
+  assert.deepEqual(upstream.calls.map(call => call.url), ['https://api.github.com/user']);
+  assert.equal(upstream.calls[0].options.redirect, 'manual');
+  assert.equal(JSON.stringify(result).includes('private-canary'), false);
+});
+
+test('census scope, identity and missing private coverage failures preserve the last good snapshot', async t => {
+  for (const [name, body, scope, code] of [
+    ['broader repo scope', censusBody, 'read:user, repo', 'census_scope_mismatch'],
+    ['broader user scope', censusBody, 'user', 'census_scope_mismatch'],
+    ['missing scope header', censusBody, null, 'census_scope_mismatch'],
+    ['empty scope header', censusBody, '', 'census_scope_mismatch'],
+    ['wrong account login', { ...censusBody, login: 'other' }, 'read:user', 'identity_mismatch'],
+    ['different account ID', { ...censusBody, id: ACCOUNT_ID + 1 }, 'read:user', 'identity_mismatch'],
+    ['invalid account ID', { ...censusBody, id: 0 }, 'read:user', 'invalid_github_response'],
+    ['missing private count', { ...censusBody, owned_private_repos: undefined }, 'read:user', 'private_coverage_unverified'],
+    ['invalid private count', { ...censusBody, owned_private_repos: -1 }, 'read:user', 'private_coverage_unverified'],
+  ]) await t.test(name, async () => {
+    const original = JSON.stringify(snapshot);
+    const kv = memoryKV(original);
+    const upstream = mockFetch([json(pairedIdentity), censusResponse(body, scope)]);
+    let failure;
+    try {
+      await refreshStats({ ...environment(kv), GITHUB_CENSUS_TOKEN: CENSUS_TOKEN }, { fetchImpl: upstream.fetchImpl, now: () => new Date(NOW) });
+    } catch (error) { failure = error; }
+    assert.ok(failure);
+    assert.equal(failure.code, code);
+    assert.equal(String(failure).includes(CENSUS_TOKEN), false);
+    assert.equal(String(failure).includes('private-canary'), false);
+    assert.equal(upstream.calls.length, 2);
+    assert.equal(kv.puts.length, 0);
+    assert.equal(await kv.get(), original);
+  });
+});
+
+test('paired credentials require a positive metadata-token account ID before the census request', async t => {
+  for (const id of [undefined, 0, -1, 1.5, '151975154']) await t.test(String(id), async () => {
+    const upstream = mockFetch([json({ ...pairedIdentity, id })]);
+    await assert.rejects(collectStats({ token: TOKEN, censusToken: CENSUS_TOKEN, fetchImpl: upstream.fetchImpl }), /invalid_github_response/);
+    assert.equal(upstream.calls.length, 1);
+  });
+});
+
+test('paired refresh still rejects a partial private inventory and preserves last-good data', async () => {
+  const original = JSON.stringify(snapshot);
+  const kv = memoryKV(original);
+  const upstream = mockFetch([json(pairedIdentity), censusResponse(), json([repo(1, 8), repo(3, 5)])]);
+  await assert.rejects(refreshStats({ ...environment(kv), GITHUB_CENSUS_TOKEN: CENSUS_TOKEN }, { fetchImpl: upstream.fetchImpl }), /incomplete_inventory/);
+  assert.equal(kv.puts.length, 0);
+  assert.equal(await kv.get(), original);
+});
+
+test('successful paired refresh passes both native secrets and stores only aggregates', async () => {
+  const kv = memoryKV();
+  const upstream = mockFetch([json(pairedIdentity), censusResponse(), json([repo(1, 8), repo(2, 3, true), repo(3, 5)])]);
+  const result = await refreshStats({ ...environment(kv), GITHUB_CENSUS_TOKEN: CENSUS_TOKEN }, { fetchImpl: upstream.fetchImpl, now: () => new Date(NOW) });
+  assert.deepEqual(result, { ...snapshot, followers: 7, stars: 16, repositories: 3 });
+  assert.equal(kv.puts.length, 1);
+  assert.equal(kv.puts[0].value.includes(CENSUS_TOKEN), false);
+  assert.equal(kv.puts[0].value.includes('private-canary'), false);
+});
+
+test('an invalid provided census credential cannot silently fall back to a broader metadata credential', async () => {
+  const upstream = mockFetch([json({ id: ACCOUNT_ID, ...user })]);
+  await assert.rejects(collectStats({ token: TOKEN, censusToken: '', fetchImpl: upstream.fetchImpl }), /missing_github_credential/);
+  assert.equal(upstream.calls.length, 1);
 });

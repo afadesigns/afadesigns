@@ -12,6 +12,7 @@ const artifactInput = process.env.PROFILE_WORKER_ARTIFACT;
 const workerName = 'profile-runtime-fixture';
 const snapshotKey = 'github-profile:v1';
 const token = 'synthetic-runtime-fixture-token';
+const censusToken = 'synthetic-runtime-census-token';
 const user = { id: 151975154, login: 'afadesigns', followers: 4, public_repos: 1, owned_private_repos: 1 };
 const repositories = [
   { id: 201, owner: { id: user.id, login: user.login }, private: false, fork: false, stargazers_count: 3, name: 'public-fixture' },
@@ -41,14 +42,22 @@ test('compiled Worker runs with isolated workerd storage and synthetic outbound 
 
   const outboundService = async request => {
     const url = new URL(request.url);
-    outboundCalls.push({ origin: url.origin, pathname: url.pathname });
+    const censusRequest = request.headers.get('authorization') === 'Bearer ' + censusToken;
+    outboundCalls.push({ origin: url.origin, pathname: url.pathname, role: censusRequest ? 'census' : 'metadata' });
     assert.equal(url.origin, 'https://api.github.com');
     assert.equal(request.method, 'GET');
-    assert.equal(request.headers.get('authorization'), `Bearer ${token}`);
+    if (censusRequest) {
+      assert.ok(responseMode.startsWith('paired-'));
+      assert.equal(url.pathname, '/user', 'The census token must never reach repository enumeration.');
+      const payload = responseMode === 'paired-id-mismatch' ? { ...user, id: user.id + 1 } : user;
+      const scopes = responseMode === 'paired-scope-invalid' ? 'read:user, repo' : 'read:user';
+      return RuntimeResponse.json(payload, { headers: { 'x-oauth-scopes': scopes } });
+    }
+    assert.equal(request.headers.get('authorization'), 'Bearer ' + token);
     if (responseMode === 'failure') return new RuntimeResponse('synthetic upstream unavailable', { status: 503 });
     if (responseMode === 'redirect') return new RuntimeResponse(null, { status: 302, headers: { location: 'https://redirect.invalid/secret-canary' } });
     if (url.pathname === '/user') {
-      const payload = responseMode === 'unverifiable'
+      const payload = responseMode === 'unverifiable' || responseMode.startsWith('paired-')
         ? { id: user.id, login: user.login, followers: user.followers, public_repos: user.public_repos }
         : user;
       return RuntimeResponse.json(payload);
@@ -59,7 +68,7 @@ test('compiled Worker runs with isolated workerd storage and synthetic outbound 
     throw new Error('Unexpected synthetic outbound request');
   };
 
-  const options = enabled => ({
+  const options = (enabled, paired = false) => ({
     ...convertV4MiniflareOptions({
       name: workerName,
       modules: true,
@@ -79,7 +88,7 @@ test('compiled Worker runs with isolated workerd storage and synthetic outbound 
       isolatedResourcePersistencePath: path.join(directory, 'isolated'),
       resourceTmpPath: path.join(directory, 'runtime-tmp'),
       kvNamespaces: { PROFILE_STATS: 'profile-runtime-fixture' },
-      bindings: { GITHUB_USERNAME: user.login, GITHUB_TOKEN: token, ENABLE_REFRESH: enabled ? 'true' : 'false' },
+      bindings: { GITHUB_USERNAME: user.login, GITHUB_TOKEN: token, ...(paired ? { GITHUB_CENSUS_TOKEN: censusToken } : {}), ENABLE_REFRESH: enabled ? 'true' : 'false' },
       outboundService,
       handleStructuredLogs: entry => workerLogs.push(entry),
     }),
@@ -197,8 +206,42 @@ test('compiled Worker runs with isolated workerd storage and synthetic outbound 
       assert.equal(body.includes(token), false);
     });
 
+
+    const lastGoodBeforePair = await kv.get(snapshotKey);
+    await mf.setOptions(options(true, true));
+    kv = await mf.getKVNamespace('PROFILE_STATS', workerName);
+
+    await t.test('paired census scope and identity failures preserve the last-good runtime snapshot', async () => {
+      for (const mode of ['paired-scope-invalid', 'paired-id-mismatch']) {
+        responseMode = mode;
+        outboundCalls.length = 0;
+        const result = await scheduled();
+        assert.equal(result.status, 500);
+        assert.notEqual((await result.json()).outcome, 'ok');
+        assert.deepEqual(outboundCalls.map(call => [call.pathname, call.role]), [['/user', 'metadata'], ['/user', 'census']]);
+        assert.equal(await kv.get(snapshotKey), lastGoodBeforePair);
+      }
+    });
+
+    await t.test('paired scheduled collection validates independent census and keeps its token off repo requests', async () => {
+      responseMode = 'paired-success';
+      outboundCalls.length = 0;
+      const result = await scheduled();
+      assert.equal(result.status, 200);
+      assert.equal((await result.json()).outcome, 'ok');
+      assert.deepEqual(outboundCalls.map(call => [call.pathname, call.role]), [['/user', 'metadata'], ['/user', 'census'], ['/user/repos', 'metadata']]);
+      const stored = await kv.get(snapshotKey);
+      const value = JSON.parse(stored);
+      assert.equal(value.repositories, 2);
+      assert.equal(value.stars, 8);
+      assert.equal(value.followers, 4);
+      assert.equal(stored.includes(censusToken), false);
+      assert.equal(stored.includes('private-canary'), false);
+    });
+
     const logs = JSON.stringify(workerLogs);
     assert.equal(logs.includes(token), false);
+    assert.equal(logs.includes(censusToken), false);
     assert.equal(logs.includes('private-canary'), false);
     assert.equal(createHash('sha256').update(await readFile(artifact)).digest('hex'), artifactSha256, 'The compiled entry changed during runtime verification.');
     assert.equal(createHash('sha256').update(await readFile(configPath)).digest('hex'), configSha256, 'The compiled Worker metadata changed during runtime verification.');

@@ -47,3 +47,7 @@ Files: cloudflare.config.ts, deployment resource registry/runbook, README.md, HA
 - [ ] Deploy production, initialize real aggregate and hourly refresh, read back bindings/schedule/version and verify endpoint.
 - [ ] Update README image URL only after endpoint verification; inspect GitHub rendering.
 - [ ] Commit/push normally, verify remote equality and clean tree; retain receipts and clean temporary resources.
+
+## Verified checkpoint — 2026-11-19
+
+The paired read-only collector and protected transfer are implemented and independently reviewed. The revised compiled application gate passed 82 tests and the helper gate passed 33. The same frozen module is verified in stage and uploaded to production with activation disabled. Automatic approval review requires explicit owner approval to create the dedicated classic read:user-only census token; no classic token or production secrets were created. README cutover, live refresh verification and final publication remain pending this approval.

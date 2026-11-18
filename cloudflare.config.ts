@@ -30,7 +30,7 @@ export default defineConfig(({ mode, isPreview }) => {
         PROFILE_STATS: bindings.kv({ id: target.namespaceId }),
         GITHUB_USERNAME: bindings.text('afadesigns'),
         ENABLE_REFRESH: bindings.text(production ? 'true' : 'false'),
-        ...(production ? { GITHUB_TOKEN: bindings.secret() } : {}),
+        ...(production ? { GITHUB_TOKEN: bindings.secret(), GITHUB_CENSUS_TOKEN: bindings.secret() } : {}),
       },
       triggers: production ? [triggers.scheduled({ schedule: '0 * * * *' })] : [],
       observability: {

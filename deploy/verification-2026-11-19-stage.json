@@ -1,0 +1,42 @@
+{
+  "observedAt": "2026-11-18T23:07:28.891Z",
+  "timezone": "Europe/Stockholm",
+  "url": "https://github-profile-stage.afadesign.workers.dev/terminal.svg",
+  "syntheticFixture": true,
+  "kv": {
+    "namespaceId": "d776df49e58643fa873772ec53fa53ae",
+    "key": "github-profile:v1",
+    "observedAt": "2026-11-18T23:06:13.697Z"
+  },
+  "snapshot": {
+    "schemaVersion": 1,
+    "username": "afadesigns",
+    "followers": 12,
+    "stars": 345,
+    "repositories": 67,
+    "updatedAt": "2026-11-18T21:36:30.564Z"
+  },
+  "checks": {
+    "get": 200,
+    "head": 200,
+    "revalidation": 304,
+    "unknownRoute": 404,
+    "unsupportedMethod": 405
+  },
+  "etag": "\"bb83211439157bae239aba3bd380e8bea29a677ddf582c8c62646f26d2ae017a\"",
+  "updatedAt": "2026-11-18T21:36:30.564Z",
+  "freshness": "fresh",
+  "responseDate": "Wed, 18 Nov 2026 23:07:28 GMT",
+  "imageBytes": 2820,
+  "bodySha256": "bb83211439157bae239aba3bd380e8bea29a677ddf582c8c62646f26d2ae017a",
+  "localRenderSha256": "bb83211439157bae239aba3bd380e8bea29a677ddf582c8c62646f26d2ae017a",
+  "exactLocalRenderMatch": true,
+  "client": "Unmodified curl; no User-Agent override, no redirects, no security bypass.",
+  "moduleSha256": "f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c",
+  "versionId": "501aacb5-c683-462a-9af4-fb3160d2b118",
+  "deploymentId": "d1ae76a0-75f8-4725-bf2d-e5a2d31498ad",
+  "deploymentIdentitySource": "Authenticated API readback verified by coordinating root before this focused HTTP check.",
+  "stageSecrets": 0,
+  "stageCronSchedules": 0,
+  "stageRefreshEnabled": false
+}

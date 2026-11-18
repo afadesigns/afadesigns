@@ -1,7 +1,7 @@
 # AFADesign GitHub profile — handoff
 
-Updated: 2026-11-18 (Europe/Stockholm).
-Status: stage deployed and verified; production blocked on protected read-only GitHub credential provisioning. Public profile still uses the original static SVG.
+Updated: 2026-11-19 (Europe/Stockholm).
+Status: revised application and provisioning verified; production code prepared but disabled. Awaiting explicit approval for the separate read:user census token. Public profile remains the original static SVG.
 Action: act_mwmkbck8_db6cd746c853.
 
 ## Scope and authority
@@ -38,7 +38,7 @@ The Worker implementation is complete through compiled-runtime and deployed-stag
 
 ## Next concrete step
 
-Resolve the generated-token transfer to Vault/Worker secret without exposing the value, using the prepared metadata-only GitHub form. Existing interfaces lack that capture/transfer capability. A narrowly scoped Desktop Commander addition would need the owner's approval; no integration code has been modified. Then verify the exact credential's private-repository coverage, deploy the frozen production candidate and hourly schedule, verify live counts, update README, and commit/push the completed change.
+Obtain explicit owner approval to create the already-prepared classic GitHub PAT with only read:user (profile read), expiration 2026-12-18, and store it with the existing Metadata-read PAT as the two native github-profile-prod secrets. Automatic approval review rejected that specific creation until the owner authorizes it. After approval, recreate disposable relay resources and start a fresh recipient; prepare/consume census, then prepare/consume live before the shared expiry. Require matching identities, full owned census and independent aggregate comparison before installation. Activate and verify a real scheduled refresh, endpoint and design before changing README. Commit/push the cutover normally, verify remote equality and clean up the relay again.
 
 ## Verified progress — 2026-11-18 20:27 UTC
 
@@ -76,4 +76,52 @@ Resolve the generated-token transfer to Vault/Worker secret without exposing the
 - GitHub authenticated API at 21:52:32 UTC returns afadesigns and the live README still embeds https://raw.githubusercontent.com/afadesigns/afadesigns/main/terminal.svg?v=9. Remote main remains cbfe749ec91d966655428eb0e24f46c16b77db93; local implementation commit fa85fc33784bede3aa824f0730de504bc02da098 was signed, clean and not pushed before this documentation update.
 - Fresh paginated CLI results: 21 accessible owned repositories (2 public, 19 private), 77 stars, 6 followers. The /user response still omits owned_private_repos, so full restricted-credential coverage is not yet independently verified.
 - Authenticated Cloudflare API at 21:52:11–21:52:34 UTC confirms github-profile and github-profile-prod do not exist (HTTP 404, code 10007). Production KV remains empty. Stage is still the verified version 58c9d5c5-43bd-4812-b907-8f8dcd82fac7, ENABLE_REFRESH=false, no secrets, no cron schedules, and synthetic snapshot only.
-- No production resources, credentials, public README, or scheduled jobs were changed during this retry. The next step remains protected read-token provisioning; the narrow MCP capture/transfer extension has not been approved or implemented.
+- No production resources, credentials, public README, or scheduled jobs were changed during this retry. The next step remained protected read-token provisioning; the narrow MCP capture/transfer extension was not approved or implemented.
+
+## Existing-tool provisioning route — 2026-11-18, 23:09 Europe/Stockholm
+
+- Owner challenged the claimed need to extend Desktop Commander and requested that the existing task be completed. Fresh verify-owner-access.py returned ok=true, sudoUid=0, empty app command/directory blocks and NoNewPrivs=0. No permission expansion is needed.
+- A missing dedicated chromium_vault import action does not establish that an MCP extension is necessary. Existing Cloud Browser clipboard/UI, WebCrypto and authenticated Cloudflare API support a candidate encrypted relay; synthetic end-to-end validation is still required. No new token has been created at this checkpoint.
+- Helper scope is scripts/provisioning-relay.mjs and its focused tests. Production statistics code remains unchanged. Temporary relay uses a hard expiry, encrypted digest-keyed entries only, no public retrieval route, no credential logging and no new Cloudflare credentials. Native Worker Secret storage is the requested service destination; do not create a new Vault broker or auth chain.
+
+## Resumed verification — 2026-11-18, 23:26 Europe/Stockholm
+
+- Recovered exact repository, durable task, local commits and prepared GitHub token form. No PAT has been generated.
+- Live Cloudflare readback corrects the older checkpoint: production was uploaded by the predecessor at 22:10 UTC, active version 3a0af67e-7362-4c6d-b306-18b1f534ff7d and deployment 8572273e-9a8f-4122-bfe6-239eb176382f. It is inert: ENABLE_REFRESH=false, no secrets or schedules, workers.dev and preview URLs disabled. Reuse this resource.
+- Current cf CLI authentication is working; production secret-list returns an empty list. No new Cloudflare login or integration expansion is needed.
+- Independent relay review identified missing receipt-to-ciphertext matching and an unbounded submission fetch. Scoped fixes/tests are in progress. A separate memory-only recipient will verify/decrypt the exact receipt and pipe directly to native cf secret storage; synthetic browser-to-recipient verification must pass before live provisioning.
+- The existing collector still fails closed if the private-repository census is unavailable. Test the exact metadata-only fine-grained token before considering any adjustment.
+- Temporary relay KV created: eeba6212d16f422f97e19cc36a91226d, title github-profile-relay-stage, account 3cd944aab212b5cb1b7066e32f17b426. It is task-owned, initially empty, and must be deleted after provisioning; no relay Worker deployed yet.
+
+
+## Verified metadata-token compatibility and coordination — 2026-11-18 23:56 Europe/Stockholm
+
+- A resumed ordinary Chat review independently verified the existing application gate (59 compiled-runtime tests), frozen module hash and stage receipt; no stage redeployment was needed.
+- Focused relay/recipient suite passed 21 tests, zero failures or skips, in process 2147921 (exit 0). Independent source review confirmed matching ciphertext receipts and bounded submission timeouts.
+- Saved GitHub PAT settings 23239184 were read back: resource owner afadesigns, all owned repositories, Metadata read only, no account/user permissions. No additional PAT was created by this resumed review.
+- Receiver 2139332 consumed the live ciphertext at 22:50:04 UTC and returned private_coverage_unverified at 22:50:14 UTC, before secret installation. The exact credential does not supply the collector's required private census.
+- Official GitHub /user documentation does not promise owned_private_repos for fine-grained PATs. /user/repos supports the approved Metadata-read grant. Adding Profile write or assuming Plan read fixes the census is unsupported.
+- Fresh Cloudflare readback at 22:55:17 UTC: production refresh false, no secret binding, no schedules, workers.dev and previews disabled. No live statistics or public README cutover is complete.
+- Another ordinary Chat worker is operating receiver 2139332 and the relay. Coordination was sent to durable task inbox (messages 4df7ebbe-5109-498c-8dd2-2a5dc0ef9240 and 3c58af40-ac6c-46bc-b9cb-ac1f05d46e31); this review will not consume or replace that live transfer.
+- Candidate compatibility correction is being prepared in isolation: verify current All repositories selection plus exact owned-ID inventory equality at provisioning, bind that result to the exact credential, then permit absent census while keeping malformed/mismatched census and protocol errors rejected. It must not claim ongoing independent detection of in-place permission narrowing. No canonical collector edits or permission expansion have been made by this review.
+
+## Protected provisioning verified — 2026-11-18, 23:56 Europe/Stockholm
+
+- Fixed receipt/ciphertext matching, bounded browser submission and native CLI stdin transport. The installed cf delegates to the project version; its file reader requires a real anonymous pipe. A fixed Python bridge keeps values in memory, suppresses child output/telemetry/debugging and terminates the complete child process group on timeout. Real OS transport/descendant tests and the full compiled-artifact gate passed 80 tests with no failures or skips before the census correction.
+- Synthetic browser copy/paste, encryption, exact receipt retrieval, recipient decryption and native Worker secret installation all succeeded in github-profile-relay-stage. No production value was used for that test. The Cloud Browser virtual clipboard differs from the page clipboard; the documented native desktop paste path was verified using the synthetic value.
+- Created AFADesign profile statistics, a fine-grained GitHub PAT for all current/future afadesigns repositories with Metadata read-only only, expiring 2026-12-18. Its protected live validation returned private_coverage_unverified. No production secret was installed; production remains disabled with no schedule or public endpoint.
+- GitHub documents the private /user census under classic read:user. The scoped compatibility correction keeps the existing metadata PAT and adds a separate read:user-only profile credential, matched by numeric account ID. Repository pagination must use only the metadata PAT. Both credentials must pass the shared complete-inventory collector and an independent CLI aggregate comparison before a bulk install. No repository-write or profile-write scope is required.
+- The collector/configuration and protected pairing helper are being updated in separate files and independently reviewed. Census credentials remain in memory under one hard deadline until both validated secrets are installed. The previous recipient PID2139332 stopped with exit 0, no private key and no installation attempt, before the updated recipient is started.
+- Another resumed Chat worker was detected through the durable task mailbox and asked to remain read-only. The active integration owner is chat-root-c268cb50ec33, with an advisory task claim through 2026-11-18T23:56:01Z. Root alone owns integration, deployment and Git publication.
+- Next: verify the paired helper and new compiled artifact, reverify isolated stage, provision the two read-only credentials, then activate and verify production before changing README. Delete the task-owned relay Worker and KV after provisioning. The current profile remains the original static SVG.
+
+## Release preparation verified; approval pending — 2026-11-19, Europe/Stockholm
+
+- Revised collector uses a Metadata-read fine-grained PAT for repositories and a separate exact read:user census credential for /user. Positive numeric account IDs must match. Private-count, pagination, ownership, duplicate and last-good checks remain enforced; no raw profile or repository data enters public output.
+- Application verification against the newly compiled frozen artifact passed 82 tests, zero failures/skips (durable job e593b3ff-1a82-4c6c-b403-61b1971fef7b). Paired provisioning helpers passed 33 tests, zero failures/skips (process 2170566). Independent final review approved the exact source hashes. EOF/stop cancellation and shared deadline regressions are included.
+- Stage and production builds have identical module SHA-256 f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c. Frozen release directories use 2026-11-18 UTC build dates. Stage active version 501aacb5-c683-462a-9af4-fb3160d2b118 was read back byte-for-byte; stage has no credentials or cron. Live GET/HEAD 200, ETag 304, route 404, method 405 and exact SVG rendering passed. Receipt: deploy/verification-2026-11-19-stage.json.
+- The identical production module was uploaded and verified at version c9f3445a-c3d6-48c3-8cc5-314a8173eca0, deployment e37d317d-68dd-4d9f-99fc-d7bc9790831e. It remains disabled: ENABLE_REFRESH=false, no secrets, no schedule, workers.dev and previews off, production KV empty. Receipt: deploy/verification-2026-11-19-production-prepared.json.
+- Automatic approval review rejected clicking Generate token for a separate classic GitHub PAT with only read:user. Stated reason: the user-authored request did not specifically authorize that credential type and exact permission. No classic token was generated, and the rejected action was not retried or routed through another interface. The form is prepared as AFADesign profile census (read:user only), only read:user checked, expiration 2026-12-18. Explicit owner approval is the remaining credential gate.
+- The already-created fine-grained PAT AFADesign profile statistics remains all-owned repositories / Metadata read-only, expiration 2026-12-18; reuse it after approval. It has not been installed in production. Never print its once-only display or capture an unredacted screenshot of that page.
+- Recipients 2139332 and 2174269 stopped with exit 0, no private key or retained census credential and no production install attempt. Temporary github-profile-relay-stage Worker and KV eeba6212d16f422f97e19cc36a91226d were deleted, with subsequent 404 readbacks. No temporary relay, secret-transfer process or development server remains.
+- README and terminal.svg remain unchanged. No hourly production refresh or profile cutover is complete. Root is saving these verified changes through normal signed Git publication, then will record the resulting commit and remote verification.

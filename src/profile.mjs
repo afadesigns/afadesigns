@@ -60,7 +60,10 @@ async function requestJson(url, token, fetchImpl) {
     } finally {
       reader.releaseLock();
     }
-    return { data: JSON.parse(text), link: response.headers.get('link') };
+    return {
+      data: JSON.parse(text), link: response.headers.get('link'),
+      scopes: new Set((response.headers.get('x-oauth-scopes') ?? '').split(',').map(value => value.trim()).filter(Boolean)),
+    };
   } catch (error) {
     if (error instanceof ProfileError) throw error;
     throw new ProfileError('github_request_failed');
@@ -91,15 +94,36 @@ function nextPage(link, currentPage) {
   return next;
 }
 
+/** Read the account-wide census using a dedicated profile-read-only credential. */
+export async function readCensus({ token, username = 'afadesigns', fetchImpl = fetch }) {
+  requireValue(account(username), 'invalid_configuration');
+  requireValue(typeof token === 'string' && token.length > 0 && !/\s/.test(token), 'missing_github_credential');
+  const owner = username.toLowerCase();
+  const { data: user, scopes } = await requestJson(API + '/user', token, fetchImpl);
+  requireValue(scopes.size === 1 && scopes.has('read:user'), 'census_scope_mismatch');
+  requireValue(user && typeof user.login === 'string' && user.login.toLowerCase() === owner, 'identity_mismatch');
+  requireValue(Number.isSafeInteger(user.id) && user.id > 0 && count(user.followers) && count(user.public_repos), 'invalid_github_response');
+  requireValue(count(user.owned_private_repos), 'private_coverage_unverified');
+  return { id: user.id, username: owner, followers: user.followers, publicRepos: user.public_repos, ownedPrivateRepos: user.owned_private_repos };
+}
+
 /** Collect complete owned-repository aggregates. Nothing raw is persisted. */
-export async function collectStats({ token, username = 'afadesigns', fetchImpl = fetch, now = () => new Date() }) {
+export async function collectStats({ token, censusToken, username = 'afadesigns', fetchImpl = fetch, now = () => new Date() }) {
   requireValue(account(username), 'invalid_configuration');
   requireValue(typeof token === 'string' && token.length > 0 && !/\s/.test(token), 'missing_github_credential');
   const owner = username.toLowerCase();
   const { data: user } = await requestJson(`${API}/user`, token, fetchImpl);
   requireValue(user && typeof user.login === 'string' && user.login.toLowerCase() === owner, 'identity_mismatch');
-  requireValue(count(user.followers) && count(user.public_repos), 'invalid_github_response');
-  requireValue(count(user.owned_private_repos), 'private_coverage_unverified');
+  let census;
+  if (censusToken !== undefined) {
+    requireValue(Number.isSafeInteger(user.id) && user.id > 0, 'invalid_github_response');
+    census = await readCensus({ token: censusToken, username: owner, fetchImpl });
+    requireValue(census.id === user.id && census.username === owner, 'identity_mismatch');
+  } else {
+    requireValue(count(user.followers) && count(user.public_repos), 'invalid_github_response');
+    requireValue(count(user.owned_private_repos), 'private_coverage_unverified');
+    census = { followers: user.followers, publicRepos: user.public_repos, ownedPrivateRepos: user.owned_private_repos };
+  }
   let url = `${API}/user/repos?affiliation=owner&visibility=all&per_page=100&page=1`;
   let stars = 0;
   let publicCount = 0;
@@ -123,17 +147,18 @@ export async function collectStats({ token, username = 'afadesigns', fetchImpl =
     url = nextPage(link, page);
     requireValue(url === null || data.length > 0, 'incomplete_inventory');
   }
-  requireValue(publicCount === user.public_repos, 'incomplete_inventory');
-  requireValue(ids.size === user.public_repos + user.owned_private_repos, 'incomplete_inventory');
+  requireValue(publicCount === census.publicRepos, 'incomplete_inventory');
+  requireValue(ids.size === census.publicRepos + census.ownedPrivateRepos, 'incomplete_inventory');
   const instant = now();
   requireValue(instant instanceof Date && Number.isFinite(instant.valueOf()), 'invalid_configuration');
-  return { schemaVersion: 1, username: owner, followers: user.followers, stars, repositories: ids.size, updatedAt: instant.toISOString() };
+  return { schemaVersion: 1, username: owner, followers: census.followers, stars, repositories: ids.size, updatedAt: instant.toISOString() };
 }
 
 /** Replace the last good snapshot only after the complete collection succeeds. */
 export async function refreshStats(env, options = {}) {
   const snapshot = await collectStats({
     token: env.GITHUB_TOKEN,
+    censusToken: env.GITHUB_CENSUS_TOKEN,
     username: env.GITHUB_USERNAME ?? 'afadesigns',
     ...options,
   });
