@@ -1,0 +1,170 @@
+{
+  "observedAt": "2026-11-19T00:10:32.326Z",
+  "timezone": "Europe/Stockholm",
+  "url": "https://github-profile-prod.afadesign.workers.dev/terminal.svg",
+  "syntheticFixture": false,
+  "kv": {
+    "namespaceId": "aeae71f12c784fc7826ea2cf6c1c2474",
+    "key": "github-profile:v1",
+    "observedAt": "2026-11-19T00:09:54.626Z"
+  },
+  "snapshot": {
+    "schemaVersion": 1,
+    "username": "afadesigns",
+    "followers": 6,
+    "stars": 77,
+    "repositories": 21,
+    "updatedAt": "2026-11-19T00:09:39.084Z"
+  },
+  "checks": {
+    "get": 200,
+    "head": 200,
+    "revalidation": 304,
+    "unknownRoute": 404,
+    "unsupportedMethod": 405
+  },
+  "etag": "\"e4cf0f9b4b1ebfcfa2d7984ba8aae3bfc1762cda5dae83a7b2f95641805440d7\"",
+  "updatedAt": "2026-11-19T00:09:39.084Z",
+  "freshness": "fresh",
+  "responseDate": "Thu, 19 Nov 2026 00:10:31 GMT",
+  "imageBytes": 2818,
+  "bodySha256": "e4cf0f9b4b1ebfcfa2d7984ba8aae3bfc1762cda5dae83a7b2f95641805440d7",
+  "localRenderSha256": "e4cf0f9b4b1ebfcfa2d7984ba8aae3bfc1762cda5dae83a7b2f95641805440d7",
+  "exactLocalRenderMatch": true,
+  "matchesPairedValidation": true,
+  "pairedValidationAt": "2026-11-18T23:56:31.711Z",
+  "client": "Unmodified curl; no User-Agent override, no redirects, no security bypass.",
+  "moduleSha256": "f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c",
+  "versionId": "3fa9ea41-ed7b-47b6-be84-ff5715c8dda9",
+  "deploymentId": "abe52950-e6b5-45f4-973e-40ce98e29b0b",
+  "deploymentCreatedAt": "2026-11-18T23:57:33.024703Z",
+  "deploymentIdentitySource": "Authenticated API readback verified by coordinating root before this focused HTTP check.",
+  "enableRefresh": true,
+  "workersDev": true,
+  "previewUrls": false,
+  "secretBindingNames": [
+    "GITHUB_TOKEN",
+    "GITHUB_CENSUS_TOKEN"
+  ],
+  "finalSchedules": [
+    {
+      "cron": "0 * * * *"
+    }
+  ],
+  "scheduleEvidence": {
+    "observedAt": "2026-11-19T00:10:17.023Z",
+    "source": "Authenticated Cloudflare GET schedules",
+    "modifiedAt": "2026-11-19T00:08:29.292258Z",
+    "bootstrapMayContinueDuringPropagation": true
+  },
+  "firstRefreshEvidence": {
+    "invocationAt": "2026-11-19T00:07:39.947Z",
+    "eventType": "scheduled",
+    "outcome": "ok",
+    "event": "profile_stats_updated",
+    "updatedAt": "2026-11-19T00:07:39.834Z",
+    "trigger": "bootstrap minute schedule",
+    "source": "Coordinating root reports independent reviewer's scoped Cloudflare Observability query"
+  },
+  "applicationTests": {
+    "passed": 82,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "Previously verified compiled artifact gate; not rerun for this live verification"
+  },
+  "provisioningTests": {
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "Coordinating root confirmed helper shutdown correction and focused passing gate; Worker module unchanged",
+    "sourceSha256": "e41f39e6af516bb820ef921db4e6380d89ea2c22c9ddf550a2719b707b585397",
+    "testsSha256": "2eb09cfb4d306c6752f0490aca6c081c76617c1570a8c39269b10c2fac7cfb95",
+    "independentReviewApproved": true
+  },
+  "githubProfile": {
+    "url": "https://github.com/afadesigns",
+    "cutoverCommit": "a3bb55e498e877328abefeadc871594b5da60324",
+    "signedCommitVerified": true,
+    "pushed": true,
+    "remoteCommitExactMatch": true,
+    "reloadedAfterCutover": true,
+    "verifiedBefore": "2026-11-19T00:15:43.354638Z",
+    "canonicalImageSource": "https://github-profile-prod.afadesign.workers.dev/terminal.svg",
+    "imageComplete": true,
+    "naturalWidth": 950,
+    "naturalHeight": 480,
+    "imageProxyHost": "camo.githubusercontent.com",
+    "visibleImageStats": {
+      "followers": 6,
+      "stars": 77,
+      "repositories": 21
+    },
+    "designPreserved": true,
+    "readmeSha256": "056b0fe92f6f16d04d862dd5d2d83bd5ce960ad2a7a67b48495d431fcf6b0bf4",
+    "readmeChange": "Image source URL only",
+    "evidenceSource": "Coordinating root's actual GitHub profile reload, rendered-image inspection and signed publication verification"
+  },
+  "credentialMetadata": {
+    "census": {
+      "binding": "GITHUB_CENSUS_TOKEN",
+      "type": "classic personal access token",
+      "scopes": [
+        "read:user"
+      ],
+      "expiration": "none",
+      "noExpirationVerifiedInGitHub": true
+    },
+    "repositoryMetadata": {
+      "binding": "GITHUB_TOKEN",
+      "type": "fine-grained personal access token",
+      "permission": "Metadata read-only",
+      "repositories": "All current and future repositories owned by afadesigns",
+      "expiresOn": "2026-12-18",
+      "noExpirationRegeneration": {
+        "automaticApprovalReview": "rejected",
+        "applied": false
+      }
+    },
+    "evidenceSource": "Coordinating root's GitHub credential metadata and protected installation verification; no credential values recorded"
+  },
+  "latestSnapshotRead": {
+    "observedAt": "2026-11-19T00:15:43.710Z",
+    "snapshot": {
+      "schemaVersion": 1,
+      "username": "afadesigns",
+      "followers": 6,
+      "stars": 77,
+      "repositories": 21,
+      "updatedAt": "2026-11-19T00:12:39.532Z"
+    },
+    "finalSchedules": [
+      {
+        "cron": "0 * * * *"
+      }
+    ],
+    "evidenceSource": "Coordinating root's authenticated production KV and schedule readback; original HTTP verification snapshot retained separately"
+  },
+  "followerCrosscheck": {
+    "restCheckedAt": "2026-11-19T00:15:43.354638Z",
+    "profileSidebarFollowers": 7,
+    "publicRestEndpoint": "/users/afadesigns",
+    "publicRestFollowers": 6,
+    "authenticatedRestEndpoint": "/user",
+    "authenticatedRestFollowers": 6,
+    "applicationSource": "GitHub REST followers field",
+    "discrepancyCause": "Not established",
+    "evidenceSource": "Coordinating root's actual profile-sidebar observation and public/authenticated REST crosscheck"
+  },
+  "cleanup": {
+    "recipientExitCode": 0,
+    "privateKeyCleared": true,
+    "censusCredentialCleared": true,
+    "relayWorkerDeleted": true,
+    "relayWorkerReadbackStatus": 404,
+    "relayKvDeleted": true,
+    "relayKvReadbackStatus": 404,
+    "browserClipboardCleared": true,
+    "relayTabsClosed": true,
+    "evidenceSource": "Coordinating root's cleanup verification"
+  }
+}

@@ -645,3 +645,68 @@ test('hard deadline timer releases the received census without a status poll', a
     t.mock.timers.reset();
   }
 });
+
+
+test('confirmed installation stays reconciled through repeated stop and EOF', async () => {
+  for (const termination of ['stop', 'eof']) {
+    const { recipient, installs } = makeRecipient();
+    try {
+      await receiveCensus(recipient);
+      const prepared = await prepare(recipient, 'live');
+      const installed = await recipient.handle(encrypted(prepared, CANARY));
+      assert.equal(installed.installed, true);
+      assert.equal((await recipient.handle({ action: 'status' })).phase, 'complete');
+      let output = '';
+      await subject.runRecipientProtocol({
+        recipient,
+        input: Readable.from(termination === 'stop' ? ['{"action":"stop"}\n'] : []),
+        output: new Writable({ write(chunk, encoding, callback) { output += chunk.toString(); callback(); } }),
+      });
+      if (termination === 'stop') {
+        const response = JSON.parse(output.trim());
+        assert.equal(response.stopped, true);
+        assert.equal(response.requiresReconciliation, false);
+      }
+      for (let repetition = 0; repetition < 3; repetition++) {
+        const status = await recipient.handle({ action: repetition ? 'stop' : 'status' });
+        assert.equal(status.phase, 'stopped');
+        assert.equal(status.installAttempted, true);
+        assert.equal(status.requiresReconciliation, false);
+        assert.equal(status.hasPrivateKey, false);
+        assert.equal(status.hasCensusCredential, false);
+      }
+      assert.equal(installs.length, 1);
+    } finally { await recipient.handle({ action: 'stop' }); }
+  }
+});
+
+test('uncertain installation stays unreconciled through repeated stop and EOF', async () => {
+  for (const termination of ['stop', 'eof']) {
+    let attempts = 0;
+    const { recipient } = makeRecipient({
+      installSecret: async () => { attempts++; throw new Error('Unconfirmed result'); },
+    });
+    try {
+      await receiveCensus(recipient);
+      const prepared = await prepare(recipient, 'live');
+      const command = encrypted(prepared, CANARY);
+      assert.equal((await recipient.handle(command)).code, 'install_outcome_unknown');
+      let output = '';
+      await subject.runRecipientProtocol({
+        recipient,
+        input: Readable.from(termination === 'stop' ? ['{"action":"stop"}\n'] : []),
+        output: new Writable({ write(chunk, encoding, callback) { output += chunk.toString(); callback(); } }),
+      });
+      if (termination === 'stop') assert.equal(JSON.parse(output.trim()).requiresReconciliation, true);
+      for (let repetition = 0; repetition < 3; repetition++) {
+        const status = await recipient.handle({ action: repetition ? 'stop' : 'status' });
+        assert.equal(status.phase, 'install_unknown');
+        assert.equal(status.requiresReconciliation, true);
+        assert.equal(status.hasPrivateKey, false);
+        assert.equal(status.hasCensusCredential, false);
+      }
+      assert.equal((await recipient.handle(command)).code, 'install_outcome_unknown');
+      assert.equal(attempts, 1);
+    } finally { await recipient.handle({ action: 'stop' }); }
+  }
+});

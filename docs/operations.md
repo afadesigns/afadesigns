@@ -76,6 +76,18 @@ static SVG as a rollback. Record token expiry dates and repeat the same scoped
 procedure before expiration; an expired token preserves the last good snapshot
 but prevents fresh hourly counts.
 
+The installed census credential has **no expiration**, as explicitly requested by
+the owner on 2026-11-19. The existing Metadata credential still expires on
+**2026-12-18**. GitHub exposes its expiry change through regeneration; automatic
+approval review rejected that separate credential replacement, so it has not been
+performed. Obtain explicit approval for replacing the Metadata credential before
+removing its expiration, then use the same protected validation and installation
+procedure.
+
+Recipient shutdown is idempotent after a confirmed installation. Repeated stop
+or EOF preserves the confirmed result and clears retained key material; genuinely
+uncertain installation attempts still require reconciliation before retry.
+
 The reviewed compatibility date is `2026-10-13`, matching the installed workerd. Use `redirect: 'manual'` for GitHub requests and explicitly reject non-200 responses; workerd does not support the Fetch `error` redirect mode.
 
 Run the focused tests and build explicitly for the intended environment:
@@ -116,7 +128,29 @@ traces are sampled at one percent. Investigate repeated refresh failures or a
 stale timestamp using the scheduled invocation logs. Correct access or upstream
 failures before the next refresh; do not replace good data with an estimate.
 
-## Verified release state — 2026-11-19
+## Verified production release — 2026-11-19
+
+Production is serving the profile at
+https://github-profile-prod.afadesign.workers.dev/terminal.svg.
+The README cutover and actual GitHub rendering are verified. The production
+receipt is `deploy/verification-2026-11-19-production.json`; it includes the
+HTTP, scheduled-execution and actual browser-rendering evidence.
+
+- The reviewed module remains `f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c`. Activation used version `3fa9ea41-ed7b-47b6-be84-ff5715c8dda9`, deployment `abe52950-e6b5-45f4-973e-40ce98e29b0b`, with production KV, both fixed secret bindings and refresh enabled. The application/compiled-runtime gate passed **82 tests**; the final provisioning suite passed **35 tests**, including idempotent shutdown.
+- A real scheduled invocation at `2026-11-19T00:07:39.947Z` completed successfully with `profile_stats_updated`, writing snapshot `00:07:39.834Z`. A later KV read verified **6 followers, 77 stars and 21 owned repositories**, updated at `00:12:39.532Z`. This confirms the actual deployed collection and both installed credentials.
+- The temporary bootstrap schedule was replaced with **only `0 * * * *`** at `00:08:29.292258Z`. Independent readback at `00:10:17.023Z` and root readback at `00:15:43.710Z` confirmed the hourly UTC configuration. The observed successful invocation preceded this restoration.
+- At `00:10:32.326Z`, GET/HEAD returned 200, ETag revalidation 304, an unknown route 404 and POST 405. Responses were fresh with no-cache. The **2,818-byte** SVG matched local rendering exactly, SHA-256 `e4cf0f9b4b1ebfcfa2d7984ba8aae3bfc1762cda5dae83a7b2f95641805440d7`.
+- README's image source alone changed in signed, pushed commit `a3bb55e498e877328abefeadc871594b5da60324`; exact remote equality was verified. Reloading the actual GitHub profile confirmed the canonical production URL and a complete Camo image at **950×480**, displaying **6/77/21** in the preserved terminal design.
+- Disposable relay resources and the recipient are cleaned up. Once-only token displays and relay tabs were closed or reloaded; the classic settings page shows only its read:user grant and No expiration. The unsubmitted fine-grained No expiration regeneration form remains for a separate owner decision. Its current **2026-12-18** expiry is an operational follow-up, not a pending production activation step.
+
+This release checkpoint includes the tested helper correction and completed
+production receipt. The separate Metadata-token lifetime decision remains the
+operational follow-up. The historic preparation record below preserves evidence
+of the earlier state.
+
+## Verified preparation — 2026-11-19
+
+This section records the preparation checkpoint before production activation.
 
 - Both explicit modes have module SHA-256 `f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c`. Frozen candidates are under `.cloudflare/releases/2026-11-18-{stage,production}-f874cbfb8fe8`; build-date labels use UTC.
 - The new application gate passed **82 tests**, including the actual compiled workerd path, with zero failures/skips. Protected provisioning passed **33 tests**, including real anonymous-pipe transport, descendant termination, matching receipts, role binding, EOF/stop cancellation and shared expiry.

@@ -1,7 +1,7 @@
 # AFADesign GitHub profile — handoff
 
 Updated: 2026-11-19 (Europe/Stockholm).
-Status: revised application and provisioning verified; production code prepared but disabled. Awaiting explicit approval for the separate read:user census token. Public profile remains the original static SVG.
+Status: production scheduled collection, HTTP behavior and actual GitHub profile rendering verified. README uses the production endpoint, with only the hourly UTC schedule configured. Verified counts are 6 followers, 77 stars and 21 owned repositories. Census credential has no expiration; the Metadata credential remains valid until 2026-12-18 and its no-expiration replacement needs separate explicit approval.
 Action: act_mwmkbck8_db6cd746c853.
 
 ## Scope and authority
@@ -26,7 +26,7 @@ GitHub signing-key registration. No GitHub Actions or paid CI. Work in ordinary 
 ## Plan and current work
 
 See docs/superpowers/plans/2026-11-18-profile-statistics.md.
-The Worker implementation is complete through compiled-runtime and deployed-stage verification. Both explicit mode builds have identical reviewed module bytes. Only the root agent integrates, deploys, commits or pushes. Credential provisioning and production/profile cutover remain incomplete.
+The Worker implementation passed 82 application/compiled-runtime tests and deployed-stage verification; both explicit mode builds have identical reviewed module bytes. Paired credentials, real scheduled production execution, exact SVG/HTTP behavior and the GitHub-rendered profile are verified. Provisioning passes 35 tests after the independently reviewed idempotent-shutdown fix. The README-only cutover was signed and pushed in a3bb55e498e877328abefeadc871594b5da60324, with exact remote equality verified. Root alone owns integration and Git publication. This release checkpoint contains the final reviewed helper correction, complete production receipt and operational documentation.
 
 ## Completion conditions
 
@@ -38,7 +38,7 @@ The Worker implementation is complete through compiled-runtime and deployed-stag
 
 ## Next concrete step
 
-Obtain explicit owner approval to create the already-prepared classic GitHub PAT with only read:user (profile read), expiration 2026-12-18, and store it with the existing Metadata-read PAT as the two native github-profile-prod secrets. Automatic approval review rejected that specific creation until the owner authorizes it. After approval, recreate disposable relay resources and start a fresh recipient; prepare/consume census, then prepare/consume live before the shared expiry. Require matching identities, full owned census and independent aggregate comparison before installation. Activate and verify a real scheduled refresh, endpoint and design before changing README. Commit/push the cutover normally, verify remote equality and clean up the relay again.
+Obtain explicit owner approval before regenerating the existing Metadata-only token with No expiration and updating GITHUB_TOKEN in github-profile-prod. Its current expiration is 2026-12-18. Production activation, the hourly configuration, actual GitHub rendering and the final receipt are already verified. The classic read:user credential is installed without expiration; its once-only plaintext display is no longer available outside the Worker. Do not repeat completed activation. Use the publishing commit's task receipt for exact final Git/signature/remote/clean-tree evidence.
 
 ## Verified progress — 2026-11-18 20:27 UTC
 
@@ -131,3 +131,38 @@ Obtain explicit owner approval to create the already-prepared classic GitHub PAT
 - Published the prior two signed preparation commits and signed implementation commit b3e44c2c62e058b4c42377cd0f5e7f1e6e06ad83 to afadesigns/afadesigns main through a normal push. git verify-commit passed; git ls-remote matched exactly; the working tree was clean. This documentation checkpoint records that verified result.
 - No literal GitHub credential values were found in the reviewed changed files. Duplicate mutable build output was removed after both frozen candidates were verified. Prior frozen candidates remain for rollback while production is disabled.
 - Remaining user decision: authorize the separate classic read:user-only census token and its storage as GITHUB_CENSUS_TOKEN in github-profile-prod. The prepared form has only read:user selected and expires 2026-12-18. After approval, resume the protected paired-transfer and activation steps above; do not claim hourly statistics are live before their first verified refresh.
+
+## Verified paired provisioning and activation — 2026-11-19, Europe/Stockholm
+
+This checkpoint supersedes the earlier classic-token approval blocker and disabled-production state. The public profile cutover still requires a verified live refresh.
+
+- The owner explicitly approved the classic census credential with “ja men ingen utgångstid”. GitHub classic PAT 6310375647 was created with only read:user and No expiration. Its value was never printed. The classic credential approval gate is resolved.
+- Protected recipient 2344002 (job dc-command-5ef52b16-a77a-4f71-bed1-869efbd37df7.scope) returned installed:true for both GITHUB_TOKEN and GITHUB_CENSUS_TOKEN after validating 6 followers, 77 stars and 21 owned repositories at 2026-11-18T23:56:31.711Z. Cloudflare secret-list/settings readback confirms both fixed secret names.
+- Production now has ENABLE_REFRESH=true with its existing KV. Active version: 3fa9ea41-ed7b-47b6-be84-ff5715c8dda9; deployment: abe52950-e6b5-45f4-973e-40ce98e29b0b, at 2026-11-18T23:57:33Z. Workers.dev is enabled; preview URLs remain disabled. Root enabled a temporary minute bootstrap cron at 23:58:12 UTC. First successful runtime refresh, live snapshot/endpoint verification, restoration of the hourly schedule and README cutover remain pending at this checkpoint.
+- Existing fine-grained Metadata-only PAT 23239184 still expires on 2026-12-18. The attempted regeneration with No expiration was rejected by automatic approval review because the owner's approval was interpreted as applying only to the classic token. Root did not retry that rejected action and reused the original fine-grained token. Any approval needed for a non-expiring fine-grained replacement is a separate remaining issue; it does not reopen the resolved classic-token approval.
+- Recreated disposable relay github-profile-relay-stage (tag 89727301353243d0b7ce72278183eb06) and KV a4075da843ed42c78143a45bacfbe98e were deleted; subsequent GETs returned 404 with codes 10007/10013. Recipient 2344002 stopped with exit 0, hasPrivateKey:false and hasCensusCredential:false. Cleanup receipt: call 3347ba27-1fac-4a99-8605-361801b57280; output SHA-256 52c5ccd0e93dceaf3707518765ef9720d2d95643aae1ab493c31c035a52d3e1c.
+- The final stop response reported install_unknown/requiresReconciliation:true despite the earlier confirmed installation. Read-only source review identifies a non-idempotent stop-state transition: the first stop changes complete to stopped; a repeated stop sees installAttempted:true with phase no longer complete and labels it unknown. No extra installation is dispatched by stop. Root will use the first successful runtime refresh as final verification of both installed credentials; no helper fix was made in this checkpoint.
+
+## Verified recipient shutdown correction — 2026-11-19, Europe/Stockholm
+
+- Fixed the concrete stop-state regression described above: an already stopped recipient preserves its state, so repeated stop commands, EOF and protocol-finally cleanup keep a confirmed installation reconciled. An in-flight or genuinely uncertain attempted installation still remains install_unknown and cannot replay. Only the recipient source/tests changed; the production Worker module is unaffected.
+- Added focused paired-install regressions for both confirmed and uncertain outcomes through stop-line and EOF shutdown, followed by repeated stops. Before the fix, the confirmed case failed and the uncertain case passed (exit 1). After the fix, the complete provisioning suite passed 35 tests, zero failures/skips/cancellations, exit 0. Process 2373089; job dc-command-a93fb82c-33e6-449e-9cb3-cd534b359c11.scope; output SHA-256 0d209b7dba2a2c530e714835395b8a4f50c2917a890be9ffb63128cb2afee22e. Independent reviewer read completion receipt 31d88edc-11ac-474a-871f-4b4c42c88de1 and approved the exact patch.
+- Tested source SHA-256: e41f39e6af516bb820ef921db4e6380d89ea2c22c9ddf550a2719b707b585397 (scripts/provisioning-recipient.mjs). Tested recipient-test SHA-256: 2eb09cfb4d306c6752f0490aca6c081c76617c1570a8c39269b10c2fac7cfb95. No application rebuild, credential operation, Cloudflare mutation or Git operation was performed for this correction.
+
+## Verified production release and profile cutover — 2026-11-19, Europe/Stockholm
+
+This record supersedes the earlier pending-refresh and static-profile checkpoints. The observations below use UTC timestamps.
+
+- A real scheduled invocation at 00:07:39.947Z completed with outcome ok and profile_stats_updated, writing snapshot 00:07:39.834Z. This verifies the deployed collector and both installed credentials, resolving the earlier shutdown-label reconciliation concern. Root's later production KV read returned 6 followers, 77 stars and 21 owned repositories with updatedAt 00:12:39.532Z.
+- Root restored only 0 * * * * at 00:08:29.292258Z. Independent readback at 00:10:17.023Z and root readback at 00:15:43.710Z confirmed that exact hourly schedule. The successful scheduled invocation above and the final hourly configuration are separately verified observations.
+- At 00:10:32.326Z, curl verification passed GET/HEAD 200, ETag 304, unknown-path 404 and POST 405, with fresh/no-cache headers. The 2,818-byte SVG matched local rendering exactly; body SHA-256 e4cf0f9b4b1ebfcfa2d7984ba8aae3bfc1762cda5dae83a7b2f95641805440d7. Production receipt: deploy/verification-2026-11-19-production.json; root is completing its browser proof.
+- README's image URL alone changed to https://github-profile-prod.afadesign.workers.dev/terminal.svg. Signed commit a3bb55e498e877328abefeadc871594b5da60324 was pushed normally and exact remote-main equality verified. Reloading https://github.com/afadesigns confirmed the canonical image source, a complete Camo image with natural size 950x480, and the preserved terminal design visibly showing 6/77/21.
+- Relay Worker/KV deletion and recipient shutdown remain verified. Root closed the old fine-grained once-only tab 28 and relay tabs 33/34; reloaded classic settings tab 31 now shows read:user/No expiration without the token value. Fine-grained regeneration tab 30 remains an unsubmitted No expiration form awaiting the separate authorization described above. No new classic-token approval is required for the completed release.
+- The GitHub side-profile UI showed 7 followers, while fresh REST /users/afadesigns and authenticated /user both returned 6 at 00:15:43.354638Z. The Worker uses the verified API value; the UI/API discrepancy's cause is unknown.
+- Final documentation, verification-receipt and helper changes still await root's final signed checkpoint and clean-tree/remote verification. The already verified README cutover commit is not a claim that those remaining changes are committed.
+
+## Integration checkpoint — 2026-11-19
+
+- Final production receipt includes the actual GitHub/Camo image proof, distinct HTTP and latest-KV snapshots, final hourly configuration, credential lifetimes and cleanup evidence.
+- The independently reviewed helper shutdown correction passes 35 tests; the unchanged Worker retains the prior 82-test compiled-runtime gate and exact deployed module hash.
+- The only remaining operational decision is the separate no-expiration replacement of the valid Metadata credential. Earlier publication-pending notes above describe their historical checkpoints. Final Git verification is recorded in the publishing task receipt.

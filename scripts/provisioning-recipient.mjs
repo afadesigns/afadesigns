@@ -417,7 +417,10 @@ export function createProvisioningRecipient({
           stopped = true;
           clearKey(session);
           clearCensus();
-          if (session) session.phase = session.installAttempted && session.phase !== 'complete' ? 'install_unknown' : 'stopped';
+          // A confirmed install becomes stopped; repeated shutdown must preserve that outcome.
+          if (session && session.phase !== 'stopped') {
+            session.phase = session.installAttempted && session.phase !== 'complete' ? 'install_unknown' : 'stopped';
+          }
           return { ...status(), stopped: true };
         }
         requireValue(['prepare', 'consume'].includes(command.action), 'invalid_command');
