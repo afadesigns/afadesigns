@@ -1,7 +1,7 @@
 # AFADesign GitHub profile — handoff
 
 Updated: 2026-11-19 (Europe/Stockholm).
-Status: both GitHub service credentials have No expiration. Metadata-only renewal and real full-census collection on the new active production version are verified, with 6 followers, 77 stars and 21 owned repositories. Production and the GitHub profile remain active. Only 0 * * * * is configured again; its restoration was verified at 01:18:08.227Z, before the 01:25 UTC deadline. Relay resources and receiver are cleaned up. Remaining work is root's final documentation/receipt review, signed commit/push and remote/clean-tree verification.
+Status: complete. Both GitHub service credentials have No expiration. Metadata-only renewal, full-census collection, the six-field 6/77/21 snapshot, HTTP behavior and the actual GitHub profile are verified. Only 0 * * * * is configured. Relay resources and receiver are cleaned up. Signed renewal commit 16cee40199fb536b7523477a9c1af7be610dbf4e was pushed, with signature, exact local/remote equality and a clean tree verified at 01:41:46.148332Z. No operational or implementation follow-up remains.
 Action: act_mwmkbck8_db6cd746c853.
 
 ## Scope and authority
@@ -26,7 +26,7 @@ GitHub signing-key registration. No GitHub Actions or paid CI. Work in ordinary 
 ## Plan and current work
 
 See docs/superpowers/plans/2026-11-18-profile-statistics.md.
-The Worker implementation passed 82 application/compiled-runtime tests and deployed-stage verification; both explicit mode builds have identical reviewed module bytes. Paired credentials, real scheduled production execution, exact SVG/HTTP behavior and the GitHub-rendered profile are verified. Provisioning now passes 44 tests, including the independently reviewed shutdown correction and Metadata-only renewal, and the real synthetic encrypted-transfer path is verified. The README-only cutover was signed and pushed in a3bb55e498e877328abefeadc871594b5da60324, with exact remote equality verified. Root alone owns integration and Git publication. The approved Metadata-only renewal is also verified through real collection on its new active Worker version; only root's final renewal documentation/receipt review and signed publication remain.
+The Worker implementation passed 82 application/compiled-runtime tests and deployed-stage verification; both explicit mode builds have identical reviewed module bytes. Paired credentials, real scheduled production execution, exact SVG/HTTP behavior and the GitHub-rendered profile are verified. Provisioning now passes 44 tests, including the independently reviewed shutdown correction and Metadata-only renewal, and the real synthetic encrypted-transfer path is verified. The README-only cutover was signed and pushed in a3bb55e498e877328abefeadc871594b5da60324, with exact remote equality verified. Root completed the reviewed renewal integration in signed commit 16cee40199fb536b7523477a9c1af7be610dbf4e and verified its publication. The approved Metadata-only renewal is verified through real collection on its new active Worker version. The separate renewal receipt and operations documentation are included in that commit.
 
 ## Completion conditions
 
@@ -38,7 +38,7 @@ The Worker implementation passed 82 application/compiled-runtime tests and deplo
 
 ## Next concrete step
 
-Review the final helper/documentation changes and deploy/verification-2026-11-19-metadata-renewal.json (owned by the coverage agent), then create and push the signed renewal checkpoint and verify exact remote equality and a clean tree. Both no-expiration credentials, successful new-version scheduled collection, complete KV snapshot, final hourly schedule and cleanup are already verified; do not repeat provisioning or recreate the relay. Baseline main f3b3a597625609829a6a5b7c460db3e7b3496370 was clean and remote-equal, but no final renewal commit or clean-tree claim is made here. Earlier approval, pending-runtime and temporary-cron notes below are historical.
+No further implementation or credential work is pending. Signed renewal commit 16cee40199fb536b7523477a9c1af7be610dbf4e is published and verified. Both no-expiration credentials, real new-version collection, complete KV snapshots, the sole hourly schedule, exact rendered output and cleanup are complete. Future work should start from the current task receipt and a fresh repository readback. Earlier approval, pending-runtime, temporary-cron and publication-pending notes below are historical checkpoints.
 
 ## Metadata renewal preparation — 2026-11-19
 
