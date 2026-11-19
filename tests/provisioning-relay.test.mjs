@@ -315,6 +315,24 @@ test('a stalled submission is aborted on deadline and retries the same ciphertex
 });
 
 
+
+test('metadata renewal has a distinct OAEP role and accepts only the repository token', async () => {
+  const f = await fixture({ mode: 'metadata-renewal' });
+  const label = JSON.parse(f.oaepLabel);
+  assert.equal(label.mode, 'metadata-renewal');
+  assert.equal(label.secret, 'GITHUB_TOKEN');
+  assert.equal(label.worker, 'github-profile-prod');
+  const browser = await ui(f);
+  await browser.submit('ghp_' + 'SyntheticCensusCanary'.padEnd(36, 'X'));
+  await browser.submit(SYNTHETIC_VALUE);
+  assert.equal(browser.calls.length, 0);
+  await browser.submit(CANARY);
+  const ciphertext = JSON.parse(browser.calls[0].options.body).ciphertext;
+  assert.equal(await decrypt(ciphertext, f.oaepLabel), CANARY);
+  await assert.rejects(decrypt(ciphertext, JSON.stringify({ ...label, mode: 'live' })));
+  assert.equal(browser.calls[0].options.body.includes(CANARY), false);
+});
+
 test('census transfer binds a separate fixed secret and accepts only its classic-token role', async () => {
   const classic = 'ghp_' + 'SyntheticCensusCanary'.padEnd(36, 'X');
   const census = await fixture({ mode: 'census' });

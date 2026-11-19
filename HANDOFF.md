@@ -1,7 +1,7 @@
 # AFADesign GitHub profile — handoff
 
 Updated: 2026-11-19 (Europe/Stockholm).
-Status: production scheduled collection, HTTP behavior and actual GitHub profile rendering verified. README uses the production endpoint, with only the hourly UTC schedule configured. Verified counts are 6 followers, 77 stars and 21 owned repositories. Census credential has no expiration; the Metadata credential remains valid until 2026-12-18 and its no-expiration replacement needs separate explicit approval.
+Status: both GitHub service credentials have No expiration. Metadata-only renewal and real full-census collection on the new active production version are verified, with 6 followers, 77 stars and 21 owned repositories. Production and the GitHub profile remain active. Only 0 * * * * is configured again; its restoration was verified at 01:18:08.227Z, before the 01:25 UTC deadline. Relay resources and receiver are cleaned up. Remaining work is root's final documentation/receipt review, signed commit/push and remote/clean-tree verification.
 Action: act_mwmkbck8_db6cd746c853.
 
 ## Scope and authority
@@ -26,7 +26,7 @@ GitHub signing-key registration. No GitHub Actions or paid CI. Work in ordinary 
 ## Plan and current work
 
 See docs/superpowers/plans/2026-11-18-profile-statistics.md.
-The Worker implementation passed 82 application/compiled-runtime tests and deployed-stage verification; both explicit mode builds have identical reviewed module bytes. Paired credentials, real scheduled production execution, exact SVG/HTTP behavior and the GitHub-rendered profile are verified. Provisioning passes 35 tests after the independently reviewed idempotent-shutdown fix. The README-only cutover was signed and pushed in a3bb55e498e877328abefeadc871594b5da60324, with exact remote equality verified. Root alone owns integration and Git publication. This release checkpoint contains the final reviewed helper correction, complete production receipt and operational documentation.
+The Worker implementation passed 82 application/compiled-runtime tests and deployed-stage verification; both explicit mode builds have identical reviewed module bytes. Paired credentials, real scheduled production execution, exact SVG/HTTP behavior and the GitHub-rendered profile are verified. Provisioning now passes 44 tests, including the independently reviewed shutdown correction and Metadata-only renewal, and the real synthetic encrypted-transfer path is verified. The README-only cutover was signed and pushed in a3bb55e498e877328abefeadc871594b5da60324, with exact remote equality verified. Root alone owns integration and Git publication. The approved Metadata-only renewal is also verified through real collection on its new active Worker version; only root's final renewal documentation/receipt review and signed publication remain.
 
 ## Completion conditions
 
@@ -38,7 +38,13 @@ The Worker implementation passed 82 application/compiled-runtime tests and deplo
 
 ## Next concrete step
 
-Obtain explicit owner approval before regenerating the existing Metadata-only token with No expiration and updating GITHUB_TOKEN in github-profile-prod. Its current expiration is 2026-12-18. Production activation, the hourly configuration, actual GitHub rendering and the final receipt are already verified. The classic read:user credential is installed without expiration; its once-only plaintext display is no longer available outside the Worker. Do not repeat completed activation. Use the publishing commit's task receipt for exact final Git/signature/remote/clean-tree evidence.
+Review the final helper/documentation changes and deploy/verification-2026-11-19-metadata-renewal.json (owned by the coverage agent), then create and push the signed renewal checkpoint and verify exact remote equality and a clean tree. Both no-expiration credentials, successful new-version scheduled collection, complete KV snapshot, final hourly schedule and cleanup are already verified; do not repeat provisioning or recreate the relay. Baseline main f3b3a597625609829a6a5b7c460db3e7b3496370 was clean and remote-equal, but no final renewal commit or clean-tree claim is made here. Earlier approval, pending-runtime and temporary-cron notes below are historical.
+
+## Metadata renewal preparation — 2026-11-19
+
+- The owner explicitly approved the separate no-expiration Metadata replacement. GitHub still shows the original all-owned, Metadata-read-only grant with no user permissions; No expiration is selected in the regeneration form but has not been submitted.
+- A hung read delayed the helper work and was interrupted. Reconciled test patch request 5f0b8cc8-a5fb-4dea-99be-a561baee7b75 applied successfully. Focused new-behavior gate 2b032884-eeb1-441e-9e9d-30b4ee3ee835 completed at 01:05:00.999Z with nine expected failures before implementation. The original deployed Worker is unchanged.
+- Temporary minute verification schedule started at 01:05:50.336181Z. Restore the sole hourly schedule after the first successful post-rotation version, or by 01:25 UTC. No regeneration or secret installation has occurred at this checkpoint.
 
 ## Verified progress — 2026-11-18 20:27 UTC
 
@@ -166,3 +172,34 @@ This record supersedes the earlier pending-refresh and static-profile checkpoint
 - Final production receipt includes the actual GitHub/Camo image proof, distinct HTTP and latest-KV snapshots, final hourly configuration, credential lifetimes and cleanup evidence.
 - The independently reviewed helper shutdown correction passes 35 tests; the unchanged Worker retains the prior 82-test compiled-runtime gate and exact deployed module hash.
 - The only remaining operational decision is the separate no-expiration replacement of the valid Metadata credential. Earlier publication-pending notes above describe their historical checkpoints. Final Git verification is recorded in the publishing task receipt.
+
+## Verified renewal helper and synthetic transfer — 2026-11-19
+
+- The exact candidate passed 44/44 provisioning tests, exit 0, in job e97f9654-bf34-44f7-aad5-b72c6d8ce7f6, finished at 01:07:16.027Z. Independent review approved recipient SHA-256 f47b9e1bf43834e5e15780dc9168e6834df5a79d5d4d2310658013865f0d8f8c and relay SHA-256 18d24d27464cca90e5550432bcf5992b95af530880d1ac1f775b3eea8631e037. The original paired path and deployed collector remain intact; the renewal path validates candidate identity, aggregates and repository-ID fingerprint against fresh independent inventories, then merges only GITHUB_TOKEN.
+- The actual synthetic browser-to-RSA-3072-to-KV-to-recipient-to-native-Cloudflare transfer and fixed-canary installation succeeded on the disposable relay Worker. Transfer d5b93689278aa5a157b9d28b9b3a4e31; receipt digest ed30a321019a6c387d5e5dc2d00a0836846158d52a7d3b969a0f3fa3bc481521; verification receipt bef763f2-aba4-458c-91c9-8bcf432ebde3. Receiver PID 2533670, scope dc-command-1afac348-975b-4f45-af2a-85651375dc5d, remains available for root's renewal preparation.
+- Disposable relay github-profile-relay-stage was created at 01:11:34.887041Z with observability disabled and isolated KV 91dbe923c2be40539eaf4f81631d30f9. These resources are still required for the pending renewal and must be deleted after verification.
+- Production Metadata has not been regenerated or rotated at this checkpoint. Root is preparing the approved renewal; the existing census credential stays installed and is not exported. The temporary minute cron remains subject to the existing deadline: restore the sole hourly 0 * * * * immediately after successful new-version collection, or by 01:25 UTC. A passing synthetic transfer does not substitute for that post-rotation production gate.
+
+## Verified Metadata regeneration and single-secret installation — 2026-11-19
+
+- GitHub fine-grained PAT 23239184 was regenerated with No expiration. Post-reload settings confirmed No expiration, all repositories owned by afadesigns, no user permissions and Metadata read-only. This is completed, explicitly approved work; the former lifetime-approval blockers are resolved.
+- Recipient confirmed installed:true for only GITHUB_TOKEN in metadata-renewal mode, with candidate validation 6 followers / 77 stars / 21 owned repositories and requiresRuntimeValidation:true. Transfer d9669bf16ae73b0dc1f7248faa6fd5fc; digest ae0d65a9751880f0d71548ea97426dc6aefa9a42d6ada52adb330957a9fce64a; receipt e58f8dac-7bbf-4e3e-ba9d-fad46a44bb5a. The existing GITHUB_CENSUS_TOKEN remains installed without exporting its plaintext.
+- Native cf created production version 9e40f9ae-5913-468b-b229-3815ae15d502, active at 100%, deployment d38bbfef-0aa6-4579-ba53-b613db057016 at 2026-11-19T01:15:02.353228Z. Fresh settings readback at 01:15:12.675Z confirmed both secret names, refresh enabled and the correct production KV. Independent module verification at 01:16:52.201Z confirmed the exact reviewed SHA-256 f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c and 14,598-byte size, with runtime/binding configuration retained. Actual scheduled collection on this new version still awaits independent runtime/KV proof.
+- Relay Worker and KV 91dbe923c2be40539eaf4f81631d30f9 deletion returned success at 01:15:58.530Z; both subsequent GETs returned 404 at 01:16:26.843Z (codes 10007/10013). Receiver 2533670 stopped with exit 0, hasPrivateKey:false, hasCensusCredential:false and requiresReconciliation:false; receipt ce5a521d-e6a6-4986-bd64-b371187dcf53. OS and virtual clipboards were cleared, the once-only token page reloaded and the relay browser closed.
+- Keep the temporary minute cron bounded: restore only 0 * * * * after successful new-version collection, or by 01:25 UTC. Settings and installation receipts do not replace the pending real-runtime validation.
+
+## Verified renewed credentials and restored hourly schedule — 2026-11-19
+
+This checkpoint completes the functional credential renewal and supersedes the pending-runtime and temporary-cron states above.
+
+- The unchanged deployed collector succeeded on new active version 9e40f9ae-5913-468b-b229-3815ae15d502. The first scheduled outcome ok and profile_stats_updated pair occurred at 01:16:02.284Z, with updatedAt 01:16:02.082Z, joined by request ca99655209c1ffe7f8de9e9bf48597ef. A later same-version success at 01:17:02.332Z produced updatedAt 01:17:02.154Z, joined by request 48183bddf2b4f639c03675d2ce985a96. This verifies the renewed Metadata token together with the preserved census credential through the actual full-census runtime gate.
+- Strict production KV readback at 01:17:45.607Z contained exactly the six allowed snapshot fields and the latest update 01:17:02.154Z, with 6 followers, 77 stars and 21 owned repositories. Both GitHub credentials now have No expiration; no census plaintext was exported.
+- Root restored only 0 * * * * at 01:18:07.20195Z. GET readback at 01:18:08.227Z confirmed a single hourly UTC schedule, completing the restoration before the 01:25 deadline. Relay absence, receiver exit and browser/clipboard cleanup are verified as recorded above.
+- Renewal receipt: deploy/verification-2026-11-19-metadata-renewal.json, maintained by the coverage agent. Only root's final documentation/receipt review, signed commit/push and remote/clean-tree verification remain. No final commit hash or publication result is assumed in this checkpoint.
+
+## Verified public endpoint and GitHub profile after renewal — 2026-11-19
+
+- Independent public HTTP verification at 2026-11-19T01:22:58.027190Z passed GET 200, HEAD 200 with an empty body, conditional GET 304 with an empty body, unknown-path 404 and POST 405 with Allow: GET, HEAD. Responses were fresh/no-cache. The SVG was 2,818 bytes; body SHA-256 and ETag were d33a9968a4c763d459432a530cdd772760e729ed2afd3c028b6f11b16f41a071.
+- The response matched local rendering byte for byte from an independently read, strict six-field KV snapshot: 6 followers, 77 stars, 21 owned repositories, updatedAt 01:22:01.956Z. The difference from earlier SVG hashes was explained by updatedAt inside the SVG comment; no application code changed. Verification job d237c6ef-762e-4456-b97e-c72bbcc81bb7 completed with exit 0 and empty stderr; receipt d9ed8847-4c96-4931-882e-3058ba1a79ea.
+- Root also reloaded the actual GitHub profile after rotation. Its Camo image was complete at natural size 950x480, visually showed 6/77/21 with the unchanged terminal design, and was marked as the deliverable. No exact browser-check timestamp was captured.
+- All runtime, public endpoint and profile checks above are verified. Root alone handles final signed Git publication; the final commit/push and remote/clean-tree verification are still pending at this checkpoint.

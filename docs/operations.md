@@ -76,17 +76,61 @@ static SVG as a rollback. Record token expiry dates and repeat the same scoped
 procedure before expiration; an expired token preserves the last good snapshot
 but prevents fresh hourly counts.
 
-The installed census credential has **no expiration**, as explicitly requested by
-the owner on 2026-11-19. The existing Metadata credential still expires on
-**2026-12-18**. GitHub exposes its expiry change through regeneration; automatic
-approval review rejected that separate credential replacement, so it has not been
-performed. Obtain explicit approval for replacing the Metadata credential before
-removing its expiration, then use the same protected validation and installation
-procedure.
+Both installed GitHub credentials now have **no expiration**, as explicitly
+approved by the owner on 2026-11-19. The `read:user` census credential remains in
+place. The Metadata credential that previously expired on **2026-12-18** was
+replaced through the protected `metadata-renewal` procedure. Saved GitHub
+settings were rechecked after regeneration: afadesigns, all owned repositories,
+Metadata read-only and No expiration. The unchanged deployed collector then
+completed a successful scheduled refresh using the new Metadata credential and
+the retained census credential. The earlier approval rejection and expiry are
+preserved in the initial release history below.
 
 Recipient shutdown is idempotent after a confirmed installation. Repeated stop
 or EOF preserves the confirmed result and clears retained key material; genuinely
 uncertain installation attempts still require reconciliation before retry.
+
+### Metadata-only renewal
+
+This distinct renewal procedure was completed and verified on 2026-11-19.
+It replaces only `GITHUB_TOKEN`, preserving the installed census credential.
+The paired `census` then `live` path above remains the initial provisioning
+procedure.
+
+1. Start a fresh protected recipient and complete a `synthetic` transfer using
+   the fixed test value. Then prepare `metadata-renewal` and transfer only the
+   replacement fine-grained Metadata-read credential. Verify its GitHub settings
+   show afadesigns, all current/future owned repositories, Metadata read-only and
+   No expiration. Use the same encrypted relay, exact receipt verification,
+   memory-only decryption and hard deadline.
+2. Validate the candidate's account identity and complete bounded owner
+   inventory. Compare its canonical inventory fingerprint and aggregates with a
+   fresh inventory read through the existing authenticated gh CLI. Keep raw
+   repository records in memory; emit only safe aggregate or validation results.
+   Do not synthesize a private census or change the shared collector's checks.
+3. Install with a native merge-only request containing `GITHUB_TOKEN` alone:
+
+   `{"secrets":{"GITHUB_TOKEN":{"name":"GITHUB_TOKEN","type":"secret_text","text":"<in-memory candidate>"}}}`
+
+   The placeholder represents the value supplied through protected stdin.
+   Omit `GITHUB_CENSUS_TOKEN` entirely so its installed value is preserved. The
+   census credential stays in the Worker and is not read back or retransferred.
+   Record the resulting active Worker version and activation time.
+4. Require a successful actual scheduled run on that new version. Provisioning
+   preflight does not substitute for the deployed collector's private-census
+   proof using the retained census credential. In Observability, match the
+   scheduled completion with outcome `ok` and its `profile_stats_updated` log
+   by request ID and new script-version ID. Require a post-rotation update and a
+   matching valid six-field production KV snapshot. A failed or incomplete
+   collection must retain the last good snapshot; do not record renewal success
+   from secret installation alone.
+
+Use the next natural hourly invocation or a bounded temporary minute schedule
+for runtime verification, then confirm that only `0 * * * *` remains configured.
+Apply the same recipient, relay and clipboard cleanup described above. Record
+the live outcome and new credential lifetime only after verification.
+
+### Application release verification
 
 The reviewed compatibility date is `2026-10-13`, matching the installed workerd. Use `redirect: 'manual'` for GitHub requests and explicitly reject non-200 responses; workerd does not support the Fetch `error` redirect mode.
 
@@ -128,6 +172,22 @@ traces are sampled at one percent. Investigate repeated refresh failures or a
 stale timestamp using the scheduled invocation logs. Correct access or upstream
 failures before the next refresh; do not replace good data with an estimate.
 
+## Verified Metadata renewal — 2026-11-19
+
+The approved Metadata-token replacement is complete. Both production GitHub
+credentials now have No expiration. The separate renewal receipt is
+`deploy/verification-2026-11-19-metadata-renewal.json`; the original production
+receipt remains unchanged as the initial-release record.
+
+- Saved GitHub settings were rechecked after regeneration at approximately 01:16 UTC: afadesigns, all current/future owned repositories, Metadata read-only and No expiration. The protected recipient installed only `GITHUB_TOKEN`; the existing `GITHUB_CENSUS_TOKEN` was omitted from the merge request and preserved.
+- The full helper suite passed **44 tests** with independent review approval. Synthetic transfer and live `metadata-renewal` succeeded. Candidate inventory/fingerprint validation agreed with a fresh gh inventory at **6 followers, 77 stars and 21 owned repositories**.
+- The secret update activated version `9e40f9ae-5913-468b-b229-3815ae15d502` at `2026-11-19T01:15:02.353228Z`, deployment `d38bbfef-0aa6-4579-ba53-b613db057016`, serving 100% of traffic. Independent module readback at `01:16:52.201Z` verified the unchanged **14,598-byte** module SHA-256 `f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c`; runtime settings, safe bindings and both secret names remained intact.
+- A strict, temporary Observability query matched scheduled completion and `profile_stats_updated` logs to the new version and the same request IDs after activation. The first success was at `01:16:02.284Z`; a second at `01:17:02.332Z` wrote `updatedAt=2026-11-19T01:17:02.154Z`. Authenticated KV readback at `01:17:45.607Z` matched that exact timestamp and the six-field **6/77/21** aggregate. This is the required deployed private-census proof with the retained census credential.
+- The temporary minute schedule was replaced with **only `0 * * * *`** at `01:18:07.20195Z`; readback at `01:18:08.227Z` confirmed the final hourly UTC schedule. The successful renewal invocations used the temporary schedule; its remaining invocations can continue briefly while the change propagates.
+- Independent HTTP verification at `01:22:58.027190Z` passed GET/HEAD 200, conditional 304, unknown route 404 and POST 405. The **2,818-byte** SVG exactly matched local rendering of the verified snapshot updated at `01:22:01.956Z`, with SHA-256/ETag `d33a9968a4c763d459432a530cdd772760e729ed2afd3c028b6f11b16f41a071`, fresh/no-cache headers and matching timestamps. Each successful collection changes the SVG comment timestamp, so a changed body hash or ETag is expected.
+- The actual GitHub profile was reloaded after rotation on 2026-11-19. Its complete Camo image remained **950×480**, showing **6/77/21** with the existing design. No exact browser observation timestamp was captured.
+- The temporary relay Worker and KV were deleted and both returned 404 at `01:16:26.843Z`. Recipient 2533670 exited 0 with no retained private key or census credential and no reconciliation required. Plaintext credentials were removed from both clipboards, the token page was reloaded without plaintext and the relay tab was closed.
+
 ## Verified production release — 2026-11-19
 
 Production is serving the profile at
@@ -143,10 +203,11 @@ HTTP, scheduled-execution and actual browser-rendering evidence.
 - README's image source alone changed in signed, pushed commit `a3bb55e498e877328abefeadc871594b5da60324`; exact remote equality was verified. Reloading the actual GitHub profile confirmed the canonical production URL and a complete Camo image at **950×480**, displaying **6/77/21** in the preserved terminal design.
 - Disposable relay resources and the recipient are cleaned up. Once-only token displays and relay tabs were closed or reloaded; the classic settings page shows only its read:user grant and No expiration. The unsubmitted fine-grained No expiration regeneration form remains for a separate owner decision. Its current **2026-12-18** expiry is an operational follow-up, not a pending production activation step.
 
-This release checkpoint includes the tested helper correction and completed
-production receipt. The separate Metadata-token lifetime decision remains the
-operational follow-up. The historic preparation record below preserves evidence
-of the earlier state.
+This initial release checkpoint includes the tested helper correction and
+completed production receipt. At that checkpoint, the Metadata-token lifetime
+decision remained the operational follow-up. Its subsequent approval and
+completed renewal are recorded above. The historic preparation record below
+preserves evidence of the earlier state.
 
 ## Verified preparation — 2026-11-19
 

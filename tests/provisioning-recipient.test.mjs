@@ -17,13 +17,22 @@ const CENSUS_CANARY = 'ghp_' + 'SyntheticCensusCanary'.padEnd(36, 'X');
 const CENSUS = { id: 12345, username: 'afadesigns', followers: 6, publicRepos: 2, ownedPrivateRepos: 19 };
 const SNAPSHOT = { schemaVersion: 1, username: 'afadesigns', followers: 6, stars: 77, repositories: 21, updatedAt: new Date(NOW).toISOString() };
 
+
+const FINGERPRINT = ids => createHash('sha256').update(JSON.stringify([...ids].sort((a, b) => a - b))).digest('hex');
+const METADATA = {
+  id: 12345, username: 'afadesigns', followers: 6, stars: 77, repositories: 21,
+  publicRepositories: 2, repositoryFingerprint: FINGERPRINT(Array.from({ length: 21 }, (_, i) => i + 1)),
+};
+
 function makeRecipient(overrides = {}) {
   const installs = [];
   const recipient = subject.createProvisioningRecipient({
     now: () => NOW,
     collect: async () => ({ ...SNAPSHOT }),
     readCensus: async () => ({ ...CENSUS }),
-    readInventory: async () => ({ username: 'afadesigns', followers: 6, stars: 77, repositories: 21 }),
+    readInventory: async options => options?.includeRepositoryFingerprint ? { ...METADATA } : ({ username: 'afadesigns', followers: 6, stars: 77, repositories: 21 }),
+    readMetadata: async () => ({ ...METADATA }),
+    replaceMetadata: async request => { installs.push({ ...request, renewal: true }); return { confirmed: true }; },
     installSecret: async request => { installs.push(request); return { confirmed: true }; },
     ...overrides,
   });
@@ -64,6 +73,235 @@ function encrypted(prepared, plaintext = SYNTHETIC_VALUE, label = prepared.oaepL
     },
   };
 }
+
+
+test('metadata renewal is separately bound and installs only its validated candidate', async () => {
+  let referenceReads = 0;
+  const { recipient, installs } = makeRecipient({
+    collect: async () => assert.fail('Renewal must not fabricate a census for collectStats.'),
+    readCensus: async () => assert.fail('The installed census must not be exported.'),
+    readInventory: async options => {
+      assert.equal(options.includeRepositoryFingerprint, true);
+      referenceReads++;
+      return { ...METADATA };
+    },
+    readMetadata: async options => {
+      assert.equal(options.token, CANARY);
+      assert.equal(options.username, 'afadesigns');
+      return { ...METADATA };
+    },
+  });
+  try {
+    const prepared = await prepare(recipient, 'metadata-renewal');
+    assert.equal(prepared.settings.expiresAt, Math.floor(NOW / 1000) + 900);
+    assert.equal(prepared.secret, 'GITHUB_TOKEN');
+    const label = JSON.parse(prepared.oaepLabel);
+    assert.equal(label.mode, 'metadata-renewal');
+    assert.equal(label.secret, 'GITHUB_TOKEN');
+    assert.equal(label.worker, 'github-profile-prod');
+    assert.equal((await recipient.handle(encrypted(prepared, CENSUS_CANARY))).code, 'invalid_credential');
+    assert.equal((await recipient.handle(encrypted(prepared, CANARY, JSON.stringify({ ...label, mode: 'live' })))).code, 'decryption_failed');
+    const command = encrypted(prepared, CANARY);
+    const result = await recipient.handle(command);
+    assert.equal(result.installed, true);
+    assert.equal(result.requiresRuntimeValidation, true);
+    assert.deepEqual(result.secrets, ['GITHUB_TOKEN']);
+    assert.deepEqual(result.validation, { username: 'afadesigns', followers: 6, stars: 77, repositories: 21 });
+    assert.equal('snapshot' in result, false);
+    assert.equal(referenceReads, 2);
+    assert.equal(installs.length, 1);
+    assert.equal(installs[0].renewal, true);
+    assert.equal(installs[0].value, CANARY);
+    assert.equal('censusToken' in installs[0], false);
+    assert.equal((await recipient.handle(command)).code, 'already_consumed');
+    assert.equal(JSON.stringify(result).includes(CANARY), false);
+    assert.equal((await recipient.handle({ action: 'status' })).hasCensusCredential, false);
+  } finally { await recipient.handle({ action: 'stop' }); }
+});
+
+test('metadata renewal rejects equal aggregates with different IDs and changing references', async () => {
+  let candidate = { ...METADATA, repositoryFingerprint: FINGERPRINT([100, 200]) };
+  const first = makeRecipient({ readMetadata: async () => candidate });
+  try {
+    const prepared = await prepare(first.recipient, 'metadata-renewal');
+    const command = encrypted(prepared, CANARY);
+    assert.equal((await first.recipient.handle(command)).code, 'independent_inventory_mismatch');
+    assert.equal(first.installs.length, 0);
+    candidate = { ...METADATA, id: 54321 };
+    assert.equal((await first.recipient.handle(command)).code, 'independent_inventory_mismatch');
+    assert.equal(first.installs.length, 0);
+    candidate = { ...METADATA };
+    assert.equal((await first.recipient.handle(command)).installed, true);
+    assert.equal(first.installs.length, 1);
+  } finally { await first.recipient.handle({ action: 'stop' }); }
+  let reads = 0;
+  const changing = makeRecipient({
+    readInventory: async () => ({ ...METADATA, stars: ++reads === 1 ? 77 : 78 }),
+  });
+  try {
+    const prepared = await prepare(changing.recipient, 'metadata-renewal');
+    assert.equal((await changing.recipient.handle(encrypted(prepared, CANARY))).code, 'independent_inventory_mismatch');
+    assert.equal(changing.installs.length, 0);
+  } finally { await changing.recipient.handle({ action: 'stop' }); }
+});
+
+test('metadata renewal expires before a late validation and never replays an uncertain write', async () => {
+  let clock = NOW;
+  const late = makeRecipient({
+    now: () => clock,
+    readMetadata: async () => { clock += 900000; return { ...METADATA }; },
+  });
+  try {
+    const prepared = await prepare(late.recipient, 'metadata-renewal');
+    assert.equal((await late.recipient.handle(encrypted(prepared, CANARY))).code, 'transfer_expired');
+    assert.equal(late.installs.length, 0);
+  } finally { await late.recipient.handle({ action: 'stop' }); }
+  let attempts = 0;
+  const unknown = makeRecipient({
+    replaceMetadata: async () => { attempts++; throw new Error(CANARY); },
+  });
+  try {
+    const prepared = await prepare(unknown.recipient, 'metadata-renewal');
+    const command = encrypted(prepared, CANARY);
+    assert.equal((await unknown.recipient.handle(command)).code, 'install_outcome_unknown');
+    assert.equal((await unknown.recipient.handle(command)).code, 'install_outcome_unknown');
+    assert.equal((await unknown.recipient.handle({ action: 'prepare', mode: 'metadata-renewal' })).code, 'install_outcome_unknown');
+    assert.equal(attempts, 1);
+    const status = await unknown.recipient.handle({ action: 'stop' });
+    assert.equal(status.requiresReconciliation, true);
+    assert.equal(status.hasPrivateKey, false);
+  } finally { await unknown.recipient.handle({ action: 'stop' }); }
+});
+
+function metadataRepo(id, isPrivate = true, stars = 1) {
+  return { id, private: isPrivate, fork: false, stargazers_count: stars,
+    owner: { id: 12345, login: 'afadesigns' }, name: 'private-name-must-not-leave-helper' };
+}
+function metadataFetch(user, pages) {
+  let index = 0;
+  const calls = [];
+  return {
+    calls,
+    fetchImpl: async (url, options) => {
+      calls.push(url);
+      assert.equal(options.headers.Authorization, 'Bearer ' + CANARY);
+      assert.equal(options.redirect, 'manual');
+      assert.ok(options.signal instanceof AbortSignal);
+      assert.equal(url.includes(CANARY), false);
+      if (index++ === 0) return Response.json(user);
+      const page = pages[index - 2];
+      assert.ok(page, 'Unexpected pagination request');
+      return page.response ?? Response.json(page.data, { headers: page.link ? { Link: page.link } : {} });
+    },
+  };
+}
+const METADATA_USER = { id: 12345, login: 'afadesigns', followers: 6, public_repos: 1 };
+const repoPage = page => 'https://api.github.com/user/repos?affiliation=owner&visibility=all&per_page=100&page=' + page;
+
+test('candidate metadata validation uses bounded owner pagination and returns only aggregate identity proof', async () => {
+  const mock = metadataFetch(METADATA_USER, [
+    { data: [metadataRepo(3, true, 5), metadataRepo(1, false, 2)], link: '<' + repoPage(2) + '>; rel="next"' },
+    { data: [metadataRepo(2, true, 3)] },
+  ]);
+  const result = await subject.readMetadataInventory({ token: CANARY, fetchImpl: mock.fetchImpl });
+  assert.deepEqual(result, {
+    id: 12345, username: 'afadesigns', followers: 6, publicRepositories: 1,
+    stars: 10, repositories: 3, repositoryFingerprint: FINGERPRINT([1, 2, 3]),
+  });
+  assert.deepEqual(mock.calls, ['https://api.github.com/user', repoPage(1), repoPage(2)]);
+  assert.equal(JSON.stringify(result).includes('private-name'), false);
+  assert.equal('ownedPrivateRepos' in result, false, 'A candidate inventory is not a fabricated account census.');
+});
+
+test('candidate metadata validation rejects identity, ownership, duplicate, pagination and response faults', async () => {
+  const valid = metadataRepo(1, false, 2);
+  const cases = [
+    [{ ...METADATA_USER, login: 'someone-else' }, [{ data: [valid] }], 'identity_mismatch'],
+    [{ ...METADATA_USER, id: -1 }, [{ data: [valid] }], 'invalid_github_response'],
+    [METADATA_USER, [{ data: [valid, valid] }], 'invalid_repository_record'],
+    [METADATA_USER, [{ data: [{ ...valid, owner: { id: 12346, login: 'afadesigns' } }] }], 'invalid_repository_record'],
+    [METADATA_USER, [{ data: [{ ...valid, owner: { id: 12345, login: 'other' } }] }], 'invalid_repository_record'],
+    [METADATA_USER, [{ data: [{ ...valid, fork: 'false' }] }], 'invalid_repository_record'],
+    [METADATA_USER, [{ data: [metadataRepo(1)] }], 'incomplete_inventory'],
+    [METADATA_USER, [{ data: [valid], link: '<https://evil.example/user/repos?page=2>; rel="next"' }], 'invalid_pagination'],
+    [METADATA_USER, [{ data: [valid], link: '<' + repoPage(3) + '>; rel="next"' }], 'invalid_pagination'],
+    [METADATA_USER, [{ data: [], link: '<' + repoPage(2) + '>; rel="next"' }], 'incomplete_inventory'],
+    [METADATA_USER, [{ response: new Response(CANARY, { status: 302, headers: { Location: 'https://evil.example/' } }) }], 'github_request_failed'],
+    [METADATA_USER, [{ response: new Response('x'.repeat(2 * 1024 * 1024 + 1), { headers: { 'Content-Type': 'application/json' } }) }], 'github_response_too_large'],
+  ];
+  for (const [user, pages, code] of cases) {
+    const mock = metadataFetch(user, pages);
+    await assert.rejects(subject.readMetadataInventory({ token: CANARY, fetchImpl: mock.fetchImpl }), error => error.code === code);
+    assert.ok(mock.calls.every(url => url.startsWith('https://api.github.com/')));
+  }
+});
+
+test('candidate metadata validation stops at the page bound', async () => {
+  let requests = 0;
+  const fetchImpl = async url => {
+    requests++;
+    if (url === 'https://api.github.com/user') return Response.json({ ...METADATA_USER, public_repos: 0 });
+    const page = Number(new URL(url).searchParams.get('page'));
+    return Response.json([metadataRepo(page)], { headers: { Link: '<' + repoPage(page + 1) + '>; rel="next"' } });
+  };
+  await assert.rejects(subject.readMetadataInventory({ token: CANARY, fetchImpl }), error => error.code === 'pagination_limit');
+  assert.equal(requests, 101, 'The 101st repository page must never be requested.');
+});
+
+test('independent inventory adds a sorted ID fingerprint only when explicitly requested', async () => {
+  const spawnImpl = (executable, args) => {
+    assert.equal(executable, 'gh');
+    const user = args.includes('/user');
+    if (user) assert.equal(args.at(-1), '{id,login,followers,public_repos}');
+    const payload = user ? METADATA_USER : [[metadataRepo(3, true, 5), metadataRepo(1, false, 2), metadataRepo(2, true, 3)]];
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.kill = () => true;
+    queueMicrotask(() => { child.stdout.end(JSON.stringify(payload)); child.emit('close', 0, null); });
+    return child;
+  };
+  const result = await subject.readIndependentInventory({ includeRepositoryFingerprint: true, spawnImpl });
+  assert.deepEqual(result, {
+    id: 12345, username: 'afadesigns', followers: 6, stars: 10, repositories: 3,
+    publicRepositories: 1, repositoryFingerprint: FINGERPRINT([1, 2, 3]),
+  });
+  assert.equal(JSON.stringify(result).includes('private-name'), false);
+});
+
+test('metadata replacement sends exactly one secret through the protected native bulk transport', async () => {
+  let captured = '';
+  let invocation;
+  let spawns = 0;
+  const spawnImpl = (executable, args, options) => {
+    spawns++;
+    invocation = { executable, args, options };
+    const child = new EventEmitter();
+    child.stdin = new PassThrough();
+    child.kill = () => true;
+    child.stdin.on('data', chunk => { captured += chunk.toString(); });
+    child.stdin.on('finish', () => queueMicrotask(() => child.emit('close', 0, null)));
+    return child;
+  };
+  assert.equal((await subject.replaceMetadataSecret({ value: CANARY, spawnImpl })).confirmed, true);
+  assert.deepEqual(JSON.parse(captured), {
+    secrets: { GITHUB_TOKEN: { name: 'GITHUB_TOKEN', type: 'secret_text', text: CANARY } },
+  });
+  assert.equal(invocation.executable, 'python3');
+  assert.deepEqual(invocation.args.slice(2), ['cf', 'workers', 'secrets', 'bulk', '--worker', 'github-profile-prod', '--mode', 'production', '--file', '/dev/stdin']);
+  assert.deepEqual(invocation.options.stdio, ['pipe', 'ignore', 'ignore']);
+  assert.equal(invocation.options.detached, true);
+  assert.equal(invocation.options.env.CF_SEND_TELEMETRY, 'false');
+  assert.equal(invocation.options.env.DEBUG, '');
+  assert.equal(JSON.stringify(invocation.args).includes(CANARY), false);
+  for (const options of [
+    { value: CENSUS_CANARY }, { value: SYNTHETIC_VALUE },
+    { value: CANARY, worker: 'another-worker' },
+    { value: CANARY, secret: 'GITHUB_CENSUS_TOKEN' },
+    { value: CANARY, censusToken: CENSUS_CANARY },
+  ]) await assert.rejects(subject.replaceMetadataSecret({ ...options, spawnImpl }), /invalid_install_target/);
+  await assert.rejects(subject.installWorkerSecret({ worker: 'github-profile-prod', value: CANARY, spawnImpl }), /invalid_install_target/);
+  assert.equal(spawns, 1, 'Old paired installation must not silently become a renewal.');
+});
 
 test('recipient prepares a usable encrypted transfer without exposing private key material', async () => {
   assert.equal(typeof subject.createProvisioningRecipient, 'function', 'The bounded recipient factory must exist.');

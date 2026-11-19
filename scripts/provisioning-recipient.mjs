@@ -72,7 +72,7 @@ function terminate(child, processGroup = false) {
   }
 }
 
-/** Spawn with no shell; raw output is deliberately discarded. An error may follow a write. */
+/** Existing paired installation remains mandatory for this production entry point. */
 export async function installWorkerSecret({ worker, value, censusToken, secret = SECRET, spawnImpl = spawn, timeoutMs = 30000 }) {
   requireValue(secret === SECRET && (
     (worker === 'github-profile-relay-stage' && value === SYNTHETIC_VALUE && censusToken === undefined) ||
@@ -83,10 +83,23 @@ export async function installWorkerSecret({ worker, value, censusToken, secret =
   if (worker === 'github-profile-prod') {
     secrets[CENSUS_SECRET] = { name: CENSUS_SECRET, type: 'secret_text', text: censusToken };
   }
-  const payload = Buffer.from(JSON.stringify({ secrets }));
-  for (const entry of Object.values(secrets)) entry.text = '';
   value = '';
   censusToken = '';
+  return sendWorkerSecrets({ worker, secrets, spawnImpl, timeoutMs });
+}
+
+/** Replace only the fixed Metadata secret; omission preserves the installed census. */
+export async function replaceMetadataSecret({ value, spawnImpl = spawn, timeoutMs = 30000, ...unexpected } = {}) {
+  requireValue(Object.keys(unexpected).length === 0 && typeof value === 'string' && VALID_TOKEN.test(value), 'invalid_install_target');
+  const secrets = { [SECRET]: { name: SECRET, type: 'secret_text', text: value } };
+  value = '';
+  return sendWorkerSecrets({ worker: 'github-profile-prod', secrets, spawnImpl, timeoutMs });
+}
+
+/** The native bulk API merges only supplied keys. Raw child output is discarded. */
+async function sendWorkerSecrets({ worker, secrets, spawnImpl, timeoutMs }) {
+  const payload = Buffer.from(JSON.stringify({ secrets }));
+  for (const entry of Object.values(secrets)) entry.text = '';
   try {
     await new Promise((resolve, reject) => {
       let child;
@@ -168,10 +181,126 @@ async function captureJson(executable, args, { spawnImpl = spawn, timeoutMs = 30
   } finally { for (const chunk of chunks) chunk.fill(0); }
 }
 
+
+const METADATA_API = 'https://api.github.com';
+const METADATA_MAX_BYTES = 2 * 1024 * 1024;
+const METADATA_MAX_PAGES = 100;
+const METADATA_FIELDS = ['id', 'username', 'followers', 'stars', 'repositories', 'publicRepositories', 'repositoryFingerprint'];
+const inventoryFingerprint = ids => hash(JSON.stringify([...ids].sort((left, right) => left - right)));
+const validMetadataInventory = value => objectWith(value, METADATA_FIELDS) &&
+  Number.isSafeInteger(value.id) && value.id > 0 && value.username === USERNAME &&
+  ['followers', 'stars', 'repositories', 'publicRepositories'].every(field => integer(value[field])) &&
+  value.publicRepositories <= value.repositories && /^[a-f0-9]{64}$/.test(value.repositoryFingerprint);
+
+async function requestMetadataJson(url, token, fetchImpl) {
+  try {
+    const response = await fetchImpl(url, {
+      method: 'GET', redirect: 'manual', signal: AbortSignal.timeout(10_000),
+      headers: {
+        Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + token,
+        'X-GitHub-Api-Version': '2026-03-10', 'User-Agent': 'AFADesign-profile-statistics',
+      },
+    });
+    if (response.status !== 200 || response.redirected) {
+      await response.body?.cancel();
+      throw new RecipientError('github_request_failed');
+    }
+    requireValue(/^application\/(?:[a-z0-9.+-]*\+)?json(?:;|$)/i.test(response.headers.get('content-type') ?? ''), 'invalid_github_response');
+    const length = response.headers.get('content-length');
+    if (length !== null && /^\d+$/.test(length) && Number(length) > METADATA_MAX_BYTES) {
+      await response.body?.cancel();
+      throw new RecipientError('github_response_too_large');
+    }
+    requireValue(response.body, 'invalid_github_response');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    let bytes = 0;
+    let text = '';
+    try {
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        bytes += value.byteLength;
+        requireValue(bytes <= METADATA_MAX_BYTES, 'github_response_too_large');
+        text += decoder.decode(value, { stream: true });
+      }
+      text += decoder.decode();
+    } catch (error) {
+      await reader.cancel().catch(() => {});
+      throw error;
+    } finally { reader.releaseLock(); }
+    return { data: JSON.parse(text), link: response.headers.get('link') };
+  } catch (error) {
+    if (error instanceof RecipientError) throw error;
+    throw new RecipientError('github_request_failed');
+  }
+}
+
+function nextMetadataPage(link, page) {
+  if (!link) return null;
+  requireValue(link.length <= 8192, 'invalid_pagination');
+  let next = null;
+  for (const part of link.split(/,\s*(?=<)/)) {
+    const match = part.match(/^\s*<([^>]+)>\s*;\s*rel="([a-z ]+)"\s*$/);
+    requireValue(match, 'invalid_pagination');
+    if (!match[2].split(' ').includes('next')) continue;
+    requireValue(next === null, 'invalid_pagination');
+    let url;
+    try { url = new URL(match[1]); } catch { throw new RecipientError('invalid_pagination'); }
+    const entries = [...url.searchParams.entries()];
+    requireValue(url.origin === METADATA_API && url.pathname === '/user/repos' &&
+      !url.username && !url.password && !url.hash && entries.length === 4 &&
+      new Set(entries.map(([key]) => key)).size === 4 &&
+      url.searchParams.get('affiliation') === 'owner' && url.searchParams.get('visibility') === 'all' &&
+      url.searchParams.get('per_page') === '100' && url.searchParams.get('page') === String(page + 1),
+    'invalid_pagination');
+    next = url.href;
+  }
+  return next;
+}
+
+/** Candidate preflight only. The deployed paired collector remains the private-census gate. */
+export async function readMetadataInventory({ token, username = USERNAME, fetchImpl = fetch }) {
+  requireValue(username === USERNAME, 'invalid_configuration');
+  requireValue(typeof token === 'string' && VALID_TOKEN.test(token), 'invalid_credential');
+  const { data: user } = await requestMetadataJson(METADATA_API + '/user', token, fetchImpl);
+  requireValue(user && user.login?.toLowerCase() === USERNAME, 'identity_mismatch');
+  requireValue(Number.isSafeInteger(user.id) && user.id > 0 && integer(user.followers) && integer(user.public_repos), 'invalid_github_response');
+  let url = METADATA_API + '/user/repos?affiliation=owner&visibility=all&per_page=100&page=1';
+  const ids = new Set();
+  let stars = 0;
+  let publicRepositories = 0;
+  for (let page = 1; url !== null; page++) {
+    requireValue(page <= METADATA_MAX_PAGES, 'pagination_limit');
+    const { data, link } = await requestMetadataJson(url, token, fetchImpl);
+    requireValue(Array.isArray(data) && data.length <= 100, 'invalid_github_response');
+    for (const repo of data) {
+      requireValue(repo && Number.isSafeInteger(repo.id) && repo.id > 0 && !ids.has(repo.id) &&
+        repo.owner?.id === user.id && repo.owner?.login?.toLowerCase() === USERNAME &&
+        typeof repo.private === 'boolean' && typeof repo.fork === 'boolean' && integer(repo.stargazers_count),
+      'invalid_repository_record');
+      ids.add(repo.id);
+      stars += repo.stargazers_count;
+      requireValue(integer(stars), 'invalid_repository_record');
+      if (!repo.private) publicRepositories++;
+    }
+    url = nextMetadataPage(link, page);
+    requireValue(url === null || data.length > 0, 'incomplete_inventory');
+  }
+  requireValue(publicRepositories === user.public_repos, 'incomplete_inventory');
+  return {
+    id: user.id, username: USERNAME, followers: user.followers, stars,
+    repositories: ids.size, publicRepositories, repositoryFingerprint: inventoryFingerprint(ids),
+  };
+}
+
 /** Existing gh authentication stays in gh; only owner aggregate data leaves this function. */
 export async function readIndependentInventory(options = {}) {
-  const user = await captureJson('gh', ['api', '/user', '--jq', '{login,followers,public_repos}'], options);
+  const fingerprintRequested = options.includeRepositoryFingerprint === true;
+  const fields = fingerprintRequested ? '{id,login,followers,public_repos}' : '{login,followers,public_repos}';
+  const user = await captureJson('gh', ['api', '/user', '--jq', fields], options);
   requireValue(user && user.login?.toLowerCase() === USERNAME && integer(user.followers) && integer(user.public_repos), 'independent_inventory_unavailable');
+  requireValue(!fingerprintRequested || (Number.isSafeInteger(user.id) && user.id > 0), 'independent_inventory_unavailable');
   const pages = await captureJson('gh', [
     'api', '--paginate', '--slurp',
     '/user/repos?affiliation=owner&visibility=all&per_page=100&page=1',
@@ -185,6 +314,7 @@ export async function readIndependentInventory(options = {}) {
     for (const repo of page) {
       requireValue(repo && Number.isSafeInteger(repo.id) && repo.id > 0 && !ids.has(repo.id) &&
         repo.owner?.login?.toLowerCase() === USERNAME && typeof repo.private === 'boolean' &&
+        (!fingerprintRequested || repo.owner?.id === user.id) &&
         integer(repo.stargazers_count), 'independent_inventory_unavailable');
       ids.add(repo.id);
       stars += repo.stargazers_count;
@@ -192,13 +322,19 @@ export async function readIndependentInventory(options = {}) {
     }
   }
   requireValue(integer(stars) && publicCount === user.public_repos, 'independent_inventory_unavailable');
-  return { username: USERNAME, followers: user.followers, stars, repositories: ids.size };
+  return {
+    username: USERNAME, followers: user.followers, stars, repositories: ids.size,
+    ...(fingerprintRequested ? {
+      id: user.id, publicRepositories: publicCount, repositoryFingerprint: inventoryFingerprint(ids),
+    } : {}),
+  };
 }
 
 /** Role-bound in-memory transfers share the census preparation's original hard deadline. */
 export function createProvisioningRecipient({
   now = () => Date.now(), collect = collectStats, readCensus: readCensusImpl = readCensus,
-  readInventory = readIndependentInventory, installSecret = installWorkerSecret, keyPairFactory = makeKeyPair,
+  readInventory = readIndependentInventory, readMetadata: readMetadataImpl = readMetadataInventory,
+  installSecret = installWorkerSecret, replaceMetadata = replaceMetadataSecret, keyPairFactory = makeKeyPair,
 } = {}) {
   let session = null;
   let censusCredential = null;
@@ -255,7 +391,7 @@ export function createProvisioningRecipient({
     return censusCredential;
   }
   async function prepare(mode) {
-    requireValue(['synthetic', 'census', 'live'].includes(mode), 'invalid_command');
+    requireValue(['synthetic', 'census', 'live', 'metadata-renewal'].includes(mode), 'invalid_command');
     requireValue(!stopped, 'recipient_stopped');
     expire();
     requireValue(session?.phase !== 'install_unknown', 'install_outcome_unknown');
@@ -321,6 +457,7 @@ export function createProvisioningRecipient({
     let token = '';
     let censusToken = '';
     let snapshot;
+    let metadataInventory;
     current.phase = 'validating';
     try {
       try {
@@ -334,7 +471,7 @@ export function createProvisioningRecipient({
       catch { throw new RecipientError('invalid_credential'); }
       const valid = current.mode === 'synthetic' ? token === SYNTHETIC_VALUE
         : current.mode === 'census' ? VALID_CENSUS_TOKEN.test(token)
-          : current.mode === 'live' && VALID_TOKEN.test(token);
+          : ['live', 'metadata-renewal'].includes(current.mode) && VALID_TOKEN.test(token);
       requireValue(valid, 'invalid_credential');
       if (current.mode === 'census') {
         try { await readCensusImpl({ token, username: USERNAME }); }
@@ -351,6 +488,25 @@ export function createProvisioningRecipient({
           transferId: current.transferId, expiresAt: current.expiresAt,
           worker: current.worker, secret: current.secret, digest: command.digest,
         };
+      }
+      if (current.mode === 'metadata-renewal') {
+        let before;
+        let after;
+        try { before = await readInventory({ includeRepositoryFingerprint: true }); }
+        catch { throw new RecipientError('independent_inventory_unavailable'); }
+        requireActive(current);
+        try { metadataInventory = await readMetadataImpl({ token, username: USERNAME }); }
+        catch (error) {
+          throw new RecipientError(SAFE_COLLECTION_ERRORS.has(error?.code) ? error.code : 'metadata_validation_failed');
+        }
+        requireActive(current);
+        try { after = await readInventory({ includeRepositoryFingerprint: true }); }
+        catch { throw new RecipientError('independent_inventory_unavailable'); }
+        requireActive(current);
+        requireValue(validMetadataInventory(before) && validMetadataInventory(metadataInventory) &&
+          validMetadataInventory(after) && METADATA_FIELDS.every(field =>
+            before[field] === metadataInventory[field] && metadataInventory[field] === after[field]),
+        'independent_inventory_mismatch');
       }
       if (current.mode === 'live') {
         const census = requireCensus();
@@ -378,10 +534,12 @@ export function createProvisioningRecipient({
       current.phase = 'installing';
       clearKey(current);
       clearCensus();
-      const installed = await installSecret({
-        worker: current.worker, secret: SECRET, value: token,
-        ...(current.mode === 'live' ? { censusToken } : {}),
-      });
+      const installed = current.mode === 'metadata-renewal'
+        ? await replaceMetadata({ value: token })
+        : await installSecret({
+          worker: current.worker, secret: SECRET, value: token,
+          ...(current.mode === 'live' ? { censusToken } : {}),
+        });
       requireValue(installed?.confirmed === true, 'install_outcome_unknown');
       current.phase = 'complete';
       return {
@@ -389,6 +547,13 @@ export function createProvisioningRecipient({
         worker: current.worker, secret: SECRET, digest: command.digest,
         ...(current.mode === 'live' ? { secrets: [SECRET, CENSUS_SECRET] } : {}),
         ...(snapshot ? { snapshot } : {}),
+        ...(metadataInventory ? {
+          secrets: [SECRET], requiresRuntimeValidation: true,
+          validation: {
+            username: metadataInventory.username, followers: metadataInventory.followers,
+            stars: metadataInventory.stars, repositories: metadataInventory.repositories,
+          },
+        } : {}),
       };
     } catch (error) {
       if (current.installAttempted) {

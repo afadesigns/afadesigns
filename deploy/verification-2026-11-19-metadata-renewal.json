@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-19T01:25:11.361Z",
+  "operation": "metadata-renewal",
+  "accountId": "3cd944aab212b5cb1b7066e32f17b426",
+  "worker": "github-profile-prod",
+  "initialProductionReceipt": "deploy/verification-2026-11-19-production.json",
+  "credential": {
+    "changedBinding": "GITHUB_TOKEN",
+    "type": "fine-grained personal access token",
+    "owner": "afadesigns",
+    "repositories": "All current and future owned repositories",
+    "permission": "Metadata read-only",
+    "expiration": "none",
+    "savedSettingsReverifiedAfterReload": true,
+    "settingsVerifiedAtApproximateUtc": "2026-11-19 01:16",
+    "retainedBinding": "GITHUB_CENSUS_TOKEN",
+    "retainedCensusScope": "read:user",
+    "retainedCensusExpiration": "none",
+    "evidenceSource": "Coordinating root verified the approved regeneration, saved GitHub grants/lifetime and protected one-secret installation"
+  },
+  "provisioning": {
+    "mode": "metadata-renewal",
+    "syntheticTransferSucceeded": true,
+    "installed": true,
+    "installedBindings": [
+      "GITHUB_TOKEN"
+    ],
+    "mergeOnly": true,
+    "censusOmittedFromPayload": true,
+    "censusPreserved": true,
+    "preflight": {
+      "boundedInventoryValidated": true,
+      "freshGhFingerprintMatched": true,
+      "followers": 6,
+      "stars": 77,
+      "repositories": 21
+    },
+    "installer": "Native cf CLI through protected anonymous stdin pipe",
+    "requiredActualRuntimeValidation": true,
+    "runtimeValidationCompleted": true,
+    "evidenceSource": "Coordinating root confirmed recipient installation; runtime evidence below independently verifies the retained-census collector on the new version"
+  },
+  "deployment": {
+    "versionId": "9e40f9ae-5913-468b-b229-3815ae15d502",
+    "versionNumber": 5,
+    "percentage": 100,
+    "deploymentId": "d38bbfef-0aa6-4579-ba53-b613db057016",
+    "activatedAt": "2026-11-19T01:15:02.353228Z",
+    "previousVersionId": "3fa9ea41-ed7b-47b6-be84-ff5715c8dda9",
+    "source": "cf_cli",
+    "triggeredBy": "secret"
+  },
+  "module": {
+    "sha256": "f874cbfb8fe8d01c77054b665bc9c90373caaf463751cfd65cb2d8c6fa599f2c",
+    "bytes": 14598,
+    "unchanged": true,
+    "verifiedAt": "2026-11-19T01:16:52.201Z",
+    "evidenceSource": "Independent reviewer authenticated Cloudflare content/v2 module readback"
+  },
+  "settings": {
+    "enableRefresh": true,
+    "githubUsername": "afadesigns",
+    "namespaceId": "aeae71f12c784fc7826ea2cf6c1c2474",
+    "compatibilityDate": "2026-10-13",
+    "secretBindingNames": [
+      "GITHUB_TOKEN",
+      "GITHUB_CENSUS_TOKEN"
+    ],
+    "runtimeAndSafeBindingsUnchanged": true,
+    "scriptEtagUnchanged": true,
+    "evidenceSource": "Coordinating root readback at 01:15:12.675Z and independent reviewer comparison at 01:16:52.201Z"
+  },
+  "scheduledRuntime": {
+    "observedAt": "2026-11-19T01:17:31.991Z",
+    "queryMethod": "POST",
+    "queryPath": "/accounts/3cd944aab212b5cb1b7066e32f17b426/workers/observability/telemetry/query",
+    "query": {
+      "queryId": "afadesigns-prod-metadata-renewal-20261119",
+      "timeframe": {
+        "from": 1795050902353,
+        "to": 1795051051448
+      },
+      "view": "events",
+      "limit": 30,
+      "dry": true,
+      "parameters": {
+        "filterCombination": "and",
+        "filters": [
+          {
+            "key": "$workers.scriptName",
+            "operation": "eq",
+            "type": "string",
+            "value": "github-profile-prod"
+          },
+          {
+            "key": "$workers.eventType",
+            "operation": "eq",
+            "type": "string",
+            "value": "scheduled"
+          },
+          {
+            "key": "$workers.scriptVersion.id",
+            "operation": "eq",
+            "type": "string",
+            "value": "9e40f9ae-5913-468b-b229-3815ae15d502"
+          }
+        ]
+      }
+    },
+    "queryStatus": "COMPLETED",
+    "queryDry": true,
+    "strictNewVersionMatch": true,
+    "successPairs": [
+      {
+        "requestId": "ca99655209c1ffe7f8de9e9bf48597ef",
+        "invocationAt": "2026-11-19T01:16:02.284Z",
+        "completionEventId": "01M7RNZZBC000000000000000F",
+        "logEventId": "01M7RNZZBC000000000000000D",
+        "eventType": "scheduled",
+        "scriptVersionId": "9e40f9ae-5913-468b-b229-3815ae15d502",
+        "cron": "* * * * *",
+        "outcome": "ok",
+        "event": "profile_stats_updated",
+        "updatedAt": "2026-11-19T01:16:02.082Z"
+      },
+      {
+        "requestId": "48183bddf2b4f639c03675d2ce985a96",
+        "invocationAt": "2026-11-19T01:17:02.332Z",
+        "completionEventId": "01M7RP1SZW000000000000000F",
+        "logEventId": "01M7RP1SZW000000000000000D",
+        "eventType": "scheduled",
+        "scriptVersionId": "9e40f9ae-5913-468b-b229-3815ae15d502",
+        "cron": "* * * * *",
+        "outcome": "ok",
+        "event": "profile_stats_updated",
+        "updatedAt": "2026-11-19T01:17:02.154Z"
+      }
+    ]
+  },
+  "snapshotRead": {
+    "observedAt": "2026-11-19T01:17:45.607Z",
+    "namespaceId": "aeae71f12c784fc7826ea2cf6c1c2474",
+    "key": "github-profile:v1",
+    "snapshot": {
+      "schemaVersion": 1,
+      "username": "afadesigns",
+      "followers": 6,
+      "stars": 77,
+      "repositories": 21,
+      "updatedAt": "2026-11-19T01:17:02.154Z"
+    },
+    "matchesSuccessfulScheduledLog": true,
+    "matchesValidatedAggregates": true
+  },
+  "schedules": {
+    "temporaryCron": "* * * * *",
+    "temporaryCronActivatedAtApproximateUtc": "2026-11-19 01:05:50",
+    "restoredAt": "2026-11-19T01:18:07.20195Z",
+    "readbackAt": "2026-11-19T01:18:08.227Z",
+    "finalSchedules": [
+      {
+        "cron": "0 * * * *"
+      }
+    ],
+    "evidenceSource": "Coordinating root authenticated PUT followed by GET; only the hourly schedule remained",
+    "observedRenewalSuccessUsedTemporaryCron": true,
+    "temporaryCronMayContinueDuringPropagation": true
+  },
+  "httpVerification": {
+    "observedAt": "2026-11-19T01:22:58.027190Z",
+    "url": "https://github-profile-prod.afadesign.workers.dev/terminal.svg",
+    "checks": {
+      "get": 200,
+      "head": 200,
+      "headBodyBytes": 0,
+      "revalidation": 304,
+      "revalidationBodyBytes": 0,
+      "unknownRoute": 404,
+      "unsupportedMethod": 405,
+      "allow": "GET, HEAD"
+    },
+    "imageBytes": 2818,
+    "bodySha256": "d33a9968a4c763d459432a530cdd772760e729ed2afd3c028b6f11b16f41a071",
+    "etag": "\"d33a9968a4c763d459432a530cdd772760e729ed2afd3c028b6f11b16f41a071\"",
+    "exactLocalRenderMatch": true,
+    "snapshot": {
+      "schemaVersion": 1,
+      "username": "afadesigns",
+      "followers": 6,
+      "stars": 77,
+      "repositories": 21,
+      "updatedAt": "2026-11-19T01:22:01.956Z"
+    },
+    "kvObservedAt": "2026-11-19T01:22:09.965Z",
+    "responseUpdatedAtMatchesKv": true,
+    "freshness": "fresh",
+    "cacheControl": "no-cache",
+    "client": "Unmodified curl; no User-Agent override, redirects or security bypass",
+    "jobId": "d237c6ef-762e-4456-b97e-c72bbcc81bb7",
+    "exitCode": 0,
+    "finishedAt": "2026-11-19T01:22:58.050Z",
+    "receiptId": "d9ed8847-4c96-4931-882e-3058ba1a79ea",
+    "recipeSha256": "94a67eb688ddc6e8f5ee0dcda7be686db31e722e154712d436620fb2eded4254",
+    "evidenceSource": "Independent reviewer final bounded HTTP and exact renderer verification",
+    "etagChangeExplanation": "The SVG comment includes snapshot.updatedAt; successful newer snapshots change the body SHA and ETag without changing the visible design"
+  },
+  "githubProfile": {
+    "url": "https://github.com/afadesigns",
+    "verifiedDate": "2026-11-19",
+    "verifiedAfterRotation": true,
+    "imageProxy": "GitHub Camo",
+    "imageComplete": true,
+    "naturalWidth": 950,
+    "naturalHeight": 480,
+    "visibleStats": {
+      "followers": 6,
+      "stars": 77,
+      "repositories": 21
+    },
+    "designPreserved": true,
+    "evidenceSource": "Coordinating root reloaded and inspected the actual profile after rotation; exact browser observation timestamp was not captured"
+  },
+  "helperTests": {
+    "passed": 44,
+    "failed": 0,
+    "skipped": 0,
+    "jobId": "e97f9654-bf34-44f7-aad5-b72c6d8ce7f6",
+    "finishedAt": "2026-11-19T01:07:16.027Z",
+    "recipeSha256": "ce43ecd3e8613fe3236ff17939486a8a278a49633e7161aac228851b3e5c175c",
+    "exitCode": 0,
+    "independentReviewApproved": true,
+    "evidenceSource": "Coordinating root confirmed the full helper gate; application build and gate were not rerun"
+  },
+  "cleanup": {
+    "relayWorkerDeleted": true,
+    "relayNamespaceId": "91dbe923c2be40539eaf4f81631d30f9",
+    "relayKvDeleted": true,
+    "deletionConfirmedAt": "2026-11-19T01:15:58.530Z",
+    "absenceReadbackAt": "2026-11-19T01:16:26.843Z",
+    "workerReadbackStatus": 404,
+    "workerErrorCode": 10007,
+    "kvReadbackStatus": 404,
+    "kvErrorCode": 10013,
+    "recipientPid": 2533670,
+    "recipientExitCode": 0,
+    "recipientStopReceiptId": "ce5a521d-e6a6-4986-bd64-b371187dcf53",
+    "hasPrivateKey": false,
+    "hasCensusCredential": false,
+    "requiresReconciliation": false,
+    "osClipboardOverwrittenWithSafeRelayUrl": true,
+    "virtualClipboardEmpty": true,
+    "tokenPageReloadedWithoutPlaintext": true,
+    "relayTabClosed": true,
+    "evidenceSource": "Coordinating root verified resource absence, recipient lifecycle and browser/clipboard cleanup"
+  }
+}

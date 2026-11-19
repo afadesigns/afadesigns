@@ -52,7 +52,7 @@ function browserProgram(config) {
           ? raw === config.syntheticValue
           : config.mode === 'census'
             ? /^ghp_[A-Za-z0-9]{36}$/.test(raw)
-            : config.mode === 'live' && /^github_pat_[A-Za-z0-9_]{20,240}$/.test(raw);
+            : ['live', 'metadata-renewal'].includes(config.mode) && /^github_pat_[A-Za-z0-9_]{20,240}$/.test(raw);
         if (!valid) {
           raw = '';
           throw new Error('invalid_input');
@@ -238,7 +238,7 @@ export function createProvisioningRelay(settings, { now = Date.now() } = {}) {
   }
   const { transferId, accountId, publicKeySpki, capabilitySha256, expiresAt, mode } = settings;
   if (!/^[a-f0-9]{32}$/.test(transferId) || !/^[a-f0-9]{32}$/.test(accountId) ||
-      !/^[a-f0-9]{64}$/.test(capabilitySha256) || !['synthetic', 'census', 'live'].includes(mode) ||
+      !/^[a-f0-9]{64}$/.test(capabilitySha256) || !['synthetic', 'census', 'live', 'metadata-renewal'].includes(mode) ||
       !Number.isSafeInteger(now) || now < 0 || !Number.isSafeInteger(expiresAt)) {
     throw new Error('Invalid relay settings');
   }
